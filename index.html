@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Durban July — A Raw-Time Read</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --page:#F3F0E6;
+    --paper:#FCFBF6;
+    --paper-2:#F1EDE1;
+    --ink:#182A20;
+    --turf:#1C5137;
+    --turf-2:#2C6B4A;
+    --claret:#8B2733;
+    --claret-deep:#6C1D27;
+    --brass:#9C6C26;
+    --muted:#6B7365;
+    --rail:#D8D3C2;
+    --shadow:rgba(24,42,32,.13);
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;background:var(--page);color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:34px 22px 80px;}
+
+  /* Masthead */
+  .kicker{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--turf);font-weight:500;margin:0 0 14px;}
+  h1.mast{font-family:'Fraunces',serif;font-weight:900;font-optical-sizing:144;
+    font-size:clamp(38px,7.2vw,62px);line-height:.98;letter-spacing:-.015em;margin:0 0 16px;}
+  h1.mast em{font-style:italic;color:var(--turf);font-weight:600;}
+  .standfirst{font-size:16.5px;max-width:62ch;margin:0 0 22px;color:#33413a;}
+  .standfirst b{color:var(--ink);font-weight:600;}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;
+    padding:12px 0 4px;border-top:1px solid var(--rail);margin-bottom:26px;}
+  .lg{display:inline-flex;align-items:center;gap:7px;font-family:'IBM Plex Mono',monospace;
+    font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+  .swatch{width:11px;height:11px;border-radius:2px;display:inline-block;}
+  .swatch.s-claret{background:var(--claret);}
+  .swatch.s-brass{background:var(--brass);}
+
+  /* Saddlecloth tabs */
+  .tabs{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:24px;}
+  .tab{position:relative;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:16px;
+    width:46px;height:46px;padding:0;background:var(--paper);color:var(--ink);
+    border:1.5px solid var(--rail);border-radius:7px;cursor:pointer;
+    transition:transform .14s ease,background .14s ease,color .14s ease,border-color .14s ease;
+    display:flex;align-items:center;justify-content:center;}
+  .tab:hover{transform:translateY(-2px);border-color:var(--turf-2);}
+  .tab.active{background:var(--turf);color:#FCFBF6;border-color:var(--turf);}
+  .tab::after{content:"";position:absolute;left:9px;right:9px;bottom:-1.5px;height:3px;
+    border-radius:3px;background:transparent;}
+  .tab.mark-claret::after{background:var(--claret);}
+  .tab.mark-brass::after{background:var(--brass);}
+  .tab.active.mark-claret::after,.tab.active.mark-brass::after{bottom:6px;}
+  .tab.best{width:auto;padding:0 18px;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    background:var(--claret);color:#FCFBF6;border-color:var(--claret);}
+  .tab.best.active{background:var(--claret-deep);border-color:var(--claret-deep);}
+  .tab.best::after{display:none;}
+  .tab:focus-visible{outline:3px solid var(--turf-2);outline-offset:2px;}
+
+  /* Panel */
+  .panel{background:var(--paper);border:1px solid var(--rail);border-radius:14px;
+    padding:30px 30px 32px;box-shadow:0 18px 44px -30px var(--shadow);
+    animation:rise .32s cubic-bezier(.2,.7,.3,1);}
+  @keyframes rise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+  .r-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--claret);font-weight:600;margin:0 0 6px;}
+  .r-title{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(24px,4.4vw,33px);
+    line-height:1.05;letter-spacing:-.01em;margin:0 0 12px;}
+  .r-meta{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--muted);
+    margin:0 0 24px;letter-spacing:.02em;}
+  .r-meta .sep{color:var(--rail);padding:0 7px;}
+
+  /* Pick banner */
+  .pick{border-radius:10px;padding:18px 20px;margin-bottom:26px;position:relative;
+    background:var(--paper-2);border-left:5px solid var(--turf);}
+  .pick--standout{border-left-color:var(--claret);background:#f6ece9;}
+  .pick--value{border-left-color:var(--brass);background:#f4ecda;}
+  .flag{display:inline-flex;align-items:center;gap:7px;font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin-bottom:9px;}
+  .flag .rk{color:#fff;background:var(--turf);border-radius:4px;padding:2px 7px;}
+  .pick--standout .flag{color:var(--claret-deep);}
+  .pick--standout .flag .rk{background:var(--claret);}
+  .pick--value .flag{color:#7c5410;}
+  .pick--value .flag .rk{background:var(--brass);}
+  .pick--plain .flag{color:var(--turf);}
+  .pick-horse{font-family:'Fraunces',serif;font-weight:600;font-size:22px;line-height:1.15;margin:0 0 5px;}
+  .pick-horse .num{font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--muted);font-weight:500;}
+  .pick-line{font-size:14.5px;color:#33413a;margin:0;}
+
+  /* Body prose */
+  .bp{font-size:15px;margin:0 0 16px;color:#2b3730;}
+  .bp strong{color:var(--ink);font-weight:600;}
+  .bp em{font-style:italic;}
+
+  /* Labelled note */
+  .note{margin:0 0 17px;}
+  .note .k{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--turf);font-weight:600;display:block;margin-bottom:3px;}
+  .note .v{font-size:15px;color:#2b3730;margin:0;}
+  .note .v strong{color:var(--ink);font-weight:600;}
+  .note.verdict .k{color:var(--claret);}
+  .note.verdict .v{font-weight:500;color:var(--ink);}
+
+  /* Table */
+  .tw{overflow-x:auto;margin:0 0 22px;border:1px solid var(--rail);border-radius:10px;}
+  table.ftab{width:100%;border-collapse:collapse;font-size:13px;min-width:540px;}
+  .ftab th{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.07em;
+    text-transform:uppercase;color:var(--turf);text-align:left;padding:10px 12px;
+    background:var(--paper-2);border-bottom:1.5px solid var(--turf);white-space:nowrap;}
+  .ftab td{padding:9px 12px;border-bottom:1px solid var(--rail);vertical-align:top;color:#3a463f;}
+  .ftab tbody tr:last-child td{border-bottom:none;}
+  .ftab tbody tr:nth-child(even){background:rgba(28,81,55,.03);}
+  .c-horse{font-weight:600;color:var(--ink);white-space:nowrap;}
+  .c-mono{font-family:'IBM Plex Mono',monospace;white-space:nowrap;color:var(--ink);font-size:12px;}
+  .c-note{color:#4a5650;min-width:210px;line-height:1.45;}
+
+  /* Fades + aside */
+  .fades{border-top:1px solid var(--rail);padding-top:15px;margin-top:22px;}
+  .fades .k{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--claret);font-weight:600;display:block;margin-bottom:3px;}
+  .fades .v{font-size:13.5px;color:var(--muted);margin:0;line-height:1.5;}
+  .fades .v strong{color:#3a463f;font-weight:600;}
+  .aside{background:var(--paper-2);border-left:4px solid var(--brass);border-radius:8px;
+    padding:14px 17px;margin:24px 0 4px;}
+  .aside .k{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.13em;
+    text-transform:uppercase;color:#7c5410;font-weight:600;display:block;margin-bottom:4px;}
+  .aside .v{font-size:13.5px;color:#4a5044;margin:0;font-style:italic;line-height:1.55;}
+
+  /* Best bets */
+  .bb-intro{font-family:'Fraunces',serif;font-style:italic;font-size:19px;color:var(--turf);
+    margin:0 0 24px;max-width:54ch;line-height:1.35;}
+  .rank{display:flex;gap:18px;align-items:baseline;padding:16px 0;border-top:1px solid var(--rail);}
+  .rank:first-of-type{border-top:none;}
+  .rank .no{font-family:'Fraunces',serif;font-weight:900;font-size:40px;line-height:1;
+    color:var(--claret);min-width:44px;font-optical-sizing:144;}
+  .rank--next .no{color:var(--muted);}
+  .rank .body{flex:1;}
+  .rank .hn{font-family:'Fraunces',serif;font-weight:600;font-size:20px;margin:0 0 3px;}
+  .rank .rc{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;
+    text-transform:uppercase;color:#fff;background:var(--turf);border-radius:4px;padding:2px 8px;
+    display:inline-block;margin-left:8px;vertical-align:middle;font-weight:500;}
+  .rank .why{font-size:14.5px;color:#33413a;margin:5px 0 0;}
+  .subhead{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--claret);font-weight:600;margin:32px 0 6px;
+    padding-top:20px;border-top:2px solid var(--claret);}
+  .subhead.brass{color:var(--brass);border-top-color:var(--brass);}
+  .subnote{font-size:13.5px;color:var(--muted);margin:0 0 8px;font-style:italic;}
+  .angles{display:flex;flex-direction:column;gap:14px;margin-top:14px;}
+  .angle{display:flex;gap:14px;align-items:baseline;}
+  .angle .dot{width:10px;height:10px;border-radius:50%;background:var(--brass);margin-top:6px;flex:none;}
+  .angle .an{font-family:'Fraunces',serif;font-weight:600;font-size:17px;margin:0;}
+  .angle .rc{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;
+    color:var(--brass);text-transform:uppercase;font-weight:600;margin-left:6px;}
+  .angle .aw{font-size:14px;color:#33413a;margin:3px 0 0;}
+  .method-strip{margin-top:34px;padding:18px 20px;background:var(--paper-2);border-radius:10px;
+    font-size:13.5px;color:#33413a;}
+  .method-strip b{color:var(--turf);font-weight:600;}
+
+  footer{margin-top:34px;font-family:'IBM Plex Mono',monospace;font-size:11px;
+    letter-spacing:.06em;color:var(--muted);text-align:center;}
+
+  @media (max-width:560px){
+    .panel{padding:22px 18px 26px;}
+    .pick{padding:15px 16px;}
+    .rank .no{font-size:32px;min-width:36px;}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="kicker">Greyville · Raw-Time Method · 12 Races</p>
+    <h1 class="mast">Durban July,<br><em>on the clock.</em></h1>
+    <p class="standfirst">Twelve races read off the raw clock, not the market. Times are ranked only within the same track and trip, weight-adjusted at <b>0.1s per kilogram</b>, and Turffontein's altitude-flattered figures are set aside. Where the market floats a Highveld or Cape raider on a fast-looking time, the method fades it for a horse with genuine Greyville form.</p>
+    <div class="legend">
+      <span class="lg"><span class="swatch s-claret"></span> Standout bet</span>
+      <span class="lg"><span class="swatch s-brass"></span> Method-value angle</span>
+      <span class="lg">Surface (D-turf / G-poly) unconfirmed on most races</span>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs" aria-label="Choose a race"></nav>
+  <main id="panel" class="panel" role="region" aria-live="polite"></main>
+  <footer>Working document · picks are analysis, not advice · form read from raw times</footer>
+</div>
+
+<script>
+/* Body blocks:
+   {t:'p', h}                  paragraph
+   {t:'lp', k, h}              labelled paragraph (mono label + text)
+   {t:'vp', k:'Verdict', h}    verdict (claret label, emphasised)
+   {t:'table', head:[], rows:[[]], cls:[]}
+   {t:'fades', h}
+   {t:'aside', h}              "vs the handoff" note
+*/
+const races = [
+  { no:1, mark:null,
+    title:"Class 4 (BM82), 1600m",
+    meta:["1600m","Class 4 (BM82)","Greyville","par 97.0"],
+    pick:{variant:"plain", flag:"The constant", horse:"Hoodia", num:"(13)",
+      line:"The surface-robust each-way angle — a light 57.0kg sprinter with the stamina note to step up to the mile."},
+    body:[
+      {t:'p', h:`Switching to raw time (not the guide's ADJ/TM) means comparing like-for-like or not at all: only times from the same course code and distance get ranked, and cross-track times are noted, never ranked. Par time still stands (the header's 97:0). Every past time is projected to today's carried weight at ≈0.1s/kg.`},
+      {t:'p', h:`Here's every credible 1600m line, weight-adjusted to today, grouped by surface so nothing gets mixed:`},
+      {t:'table',
+        head:["Horse","Wt today","Surface","Best 1600m raw (wt that day)","→ today-equiv","Note"],
+        cls:["c-horse","c-mono","c-mono","c-mono","c-mono","c-note"],
+        rows:[
+          ["PLACE OF PRACTICE (3)","59.0","G poly","95.4 (60.0)","95.30","fastest raw — but a maiden-plate win, big class rise"],
+          ["TOWN CRIER (2)","60.0","G poly","96.0 (57.0)","96.30","won this C&D, +3kg today"],
+          ["MAGMA MAGIC (11)","61.0","D turf","95.6 (56.0)","96.10","won on turf; also 96.4 equiv on poly but beaten there"],
+          ["MAGMA MAGIC (11)","61.0","G poly","96.0 (57.0, 4th)","96.40","poly run was “no extra”"],
+          ["DYLAN'S CHAMP (7)","61.0","D turf","97.8 (56.0, 8th)","98.30","top weight kills it"],
+          ["SOMMERSTERN (10)","60.5","E (E. London)","97.2 (58.5)","97.40","won — but different track, raider, 0 KZN prep"],
+          ["MASTER BOMBER (14)","57.0","E","96.2 (57.0)","96.20","fast & light — but E track, no recent KZN run"]
+        ]},
+      {t:'lp', k:"What raw time changes", h:`<strong>PLACE OF PRACTICE (3) forces its way in.</strong> On the clock it's the fastest poly 1600m in the field (95.3 equiv, gun-to-tape, at today's weight). The catch is real: that was maiden-plate grade into Class 4 — a genuine class jump. Raw time loves it; class says respect-but-caution.`},
+      {t:'lp', k:"Hoodia, reframed", h:`Its fast 1600m times were all Kenilworth/L (99–105s) — not comparable to Greyville, so they can't be ranked. Its only KZN evidence is the recent G 1400m in 82:6 off 57kg, “running on at finish.” So Hoodia is a light-weight (57kg) sprinter stepping up, with the stamina note backing the trip — a live each-way play on the “ran on → step up” rule. DUBAI DUDE (12) is the same story but weaker: blazing 1400m poly (81:6, won), front-running, unproven at 1600m, wide draw — a watch. TOWN CRIER and MAGMA MAGIC hold up as the two solid, proven-at-the-mile runners.`},
+      {t:'lp', k:"The surface decides it", h:`<strong>If turf (D):</strong> MAGMA MAGIC (11) is the only horse with a credible turf 1600m win on the clock (96.10 equiv). Top pick despite 61kg; Town Crier has no turf-mile line, Place of Practice's fast time was poly. <strong>If poly (G):</strong> PLACE OF PRACTICE (3) is fastest on raw time (95.30, class caveat) → TOWN CRIER (2) 96.30 (real C&D win) → MAGMA MAGIC (a beaten 4th on the poly).`},
+      {t:'vp', k:"Verdict", h:`Turf → MAGMA MAGIC (11) on top; poly → TOWN CRIER (2) on top with PLACE OF PRACTICE (3) the fast-time danger. HOODIA (13) is the each-way angle on either surface, MASTER BOMBER (14) the East-London-time saver if you'll forgive no KZN prep.`},
+      {t:'fades', h:`WORLD ORDER (4, Highveld raider + poor form), UNITED FRONT (9, raider + respiratory history + 10-wk rest), NOTABLE (6, dreadful recent form), STAR OF THE FUTURE (15, wants 2000m — 1600m too sharp), IBUTHO (1, 8yo, two “never dangerous”). Raiders without KZN prep: SONG TO THE MOON (8), SOMMERSTERN (10).`}
+    ]
+  },
+
+  { no:2, mark:"claret",
+    title:"Tote B Stakes (open)",
+    meta:["1600m","Open","Greyville","par 97.0"],
+    pick:{variant:"standout", flag:"Standout", rk:"#7", horse:"World Of Our Own", num:"(7)",
+      line:"Fastest weight-adjusted mile in the field on either surface, surface-robust, MR rocketing 77→88."},
+    body:[
+      {t:'p', h:`Open-company mile, 13 runners (Deception Pass 13 scratched). The market is built around PLEASE BE TRUE (3) at 2/1 — and that's the first thing the method throws out. He's an all-Cape horse (K-form only), zero Greyville starts, C&D 0:0-0-0. Textbook raider fade of the favourite. Meanwhile the fastest genuine Greyville miler in the race is being offered at 10s.`},
+      {t:'p', h:`Weight-adjusted 1600m times at 0.1s/kg, ranked within surface:`},
+      {t:'table',
+        head:["Horse","Wt","Best coastal 1600m (adj)","Note"],
+        cls:["c-horse","c-mono","c-mono","c-note"],
+        rows:[
+          ["WORLD OF OUR OWN (7)","57.0","G 94.6 / 94.55; D 96.0","6 C&D runs (2 wins), fastest on both surfaces, MR 77→88 rocketing. “Include.”"],
+          ["IMPERIAL POWER (11)","57.0","G 95.2 (won)","Won the G-1600 BStks beating Sundance Kid; 10-wk break + up in wt off very light carries"],
+          ["SUNDANCE KID (12)","61.5","G 95.25","Fast, front-runner, 8 C&D — but top weight 61.5 and a perennial placer (6-6-3/39)"],
+          ["ROYAL SWORD (8)","57.0","G 95.25","3rd to WOOO at C&D; improving 3yo, Murray booked, “can go close”"],
+          ["GRAND OCCASION (4)","56.0","G 95.45 (won)","Front-running filly, well-in at 56, fast G-1600 poly times — but Cls4F→open"],
+          ["GREEN GLOW (6)","57.0","G 95.7","Improving young gelding, dual Greyville form, “can show”"]
+        ]},
+      {t:'p', h:`<strong>WORLD OF OUR OWN (7)</strong> is the method pick and it's clean: he clocks the fastest weight-adjusted 1600m in the field on either surface (G ~94.55 adj, D 96.0 adj — both under par), has 6 C&D runs with two wins, a strongly rising MR (77→88), sits well at 57.0kg, and the guide itself says “should have finished closer last time, include.” Surface-robust, which is exactly what you want when the header won't confirm the strip.`},
+      {t:'p', h:`Behind him it splits on surface. <strong>If poly (G):</strong> IMPERIAL POWER (11), SUNDANCE KID (12), GRAND OCCASION (4) and GREEN GLOW (6) all get a lift — Grand Occasion in particular is dangerous on the lead if it's poly, fast G-1600 times and 6kg-type well-in. <strong>If turf (D):</strong> World Of Our Own still tops (he has the D-run), Sundance Kid/Imperial Power's edge softens, and CAPSAICIN (10) and DIANI (9) come marginally into it on their turf/mixed form.`},
+      {t:'vp', k:"Verdict", h:`WORLD OF OUR OWN (7) → IMPERIAL POWER (11) → SUNDANCE KID (12), with ROYAL SWORD (8) and GREEN GLOW (6) each-way, and GRAND OCCASION (4) a live poly saver.`},
+      {t:'lp', k:"Pace note", h:`Grand Occasion, Capsaicin and Sundance Kid all want to lead — a genuine tempo suits the closer (World Of Our Own) even more.`},
+      {t:'fades', h:`PLEASE BE TRUE (3) — the 2/1 favourite, all-Cape, no Greyville, C&D 0:0-0-0, the signature take-on. OPEN HIGHWAY (1) — Highveld/variant (J/T/V/Y), altitude-flattered clock, minimal coastal form. STATUS (14) — all-Highveld, MR75, 15-wk break, stable debut. BRUH (5) — 13-wk break, no recent run, modest D-1600 form. DIANI (9) — honest 6yo but best at 1400m, minor at 1600m/60kg.`}
+    ]
+  },
+
+  { no:3, mark:"brass",
+    title:"Grade 3 Magical Zulu Kingdom 2200",
+    meta:["2200m","Grade 3 · AMR-101","Greyville (D-turf)","par 137.6"],
+    pick:{variant:"value", flag:"Method-value", horse:"Imilenzeyokududuma", num:"(5)",
+      line:"In-form KZN stayer dropping 2400→2200 with stamina in hand — the closer in a truly-run race."},
+    body:[
+      {t:'lp', k:"Surface confirm", h:`the two genuine 2200m clocks in the field (Otto Luyken's win, Johnny the Thief) are both D-coded (Greyville turf), par 137:6 fits turf, and this is run on the July course — so I'm treating it as D-turf with high confidence. Unlike some races it doesn't move anything: the horses I care about all have turf lines.`},
+      {t:'p', h:`The whole race turns on one fact the method cares about more than anything else: only two runners have ever clocked a real Greyville 2200m — and they ran it in the same race. On 25.07.05 (D-2200), OTTO LUYKEN won it in 136:8 off 61.0kg; JOHNNY THE THIEF was 4th, 2.4L back, in 137:3 off 52.5kg. Weight-adjusted to today: Otto Luyken 136.85 (sub-par by ~0.75s), Johnny the Thief ~137.25 (par). Everyone else's stamina and time at the trip is inferred from adjacent distances.`},
+      {t:'p', h:`By rating (AMR 101) the class shortlist is Otto Luyken 113 · Magic Verse 111 · Field Marshal 110 · Imilenzeyokududuma 109 · Tenpenny 107 · La Pulga 105 — and the handicap is tight and rating-consistent, so none of the light-weights are “well-in,” they're just lower-rated.`},
+      {t:'table',
+        head:["Horse","Wt","Genuine coastal / 2200m form (wt-adj where rankable)","Note"],
+        cls:["c-horse","c-mono","c-note","c-note"],
+        rows:[
+          ["OTTO LUYKEN (12)","61.5","D-2200 WIN 136:8 → 136.85 adj, sub-par; C&D 1:1-0-0","The only rankable sub-par exact-C&D winning clock in the race. R Fourie. But it's 52 wks old, and his last 5 read “set pace-tired late” under top weight, MR 116→113."],
+          ["IMILENZEYOKUDUDUMA (5)","59.5","D-2400 2nd, 1.05L to Native Ruler, “running on” (153:5); D-1800 4th “ran on from last”","Best current coastal form; dropping in trip, stamina in hand, “doing best work late.” Fair weight (5 below peak MR)."],
+          ["FIELD MARSHAL (7)","60.0","D-1800 5th “stayed on” (behind, but level with, Imi); won up to D-2400","Genuine Durban stayer, “should close.”"],
+          ["TENPENNY (4)","58.5","D-2400 5th, “jock amiss” (behind Native Ruler & Imi); won K-2500","Cape form but has 1 Greyville prep last start → partial forgiveness, not a raider fade."],
+          ["MAGIC VERSE (3)","60.5","all-K current form; 3rd in this race last year (C&D 1:0-0-1)","Top-3 rated but 100% Cape this campaign; 60.5kg. 1 course placing = respect, don't dismiss."],
+          ["LA PULGA (10)","57.5","D-1800 6th “not disgraced” (1st Durban run); K-1800 winner ×2","Improving 4yo (MR 95→105), Lerena, now has his coastal intro. Live e/w."]
+        ]},
+      {t:'lp', k:"Verdict — my independent read", h:`the top of this race is a genuinely close 1-2, and I want to be straight about the tension rather than paper over it. On the strictest raw-time reading, <strong>Otto Luyken (12) is #1</strong> — he owns the single most method-aligned fact in the field (the only weight-adjusted, sub-par, winning Greyville-2200m clock) plus R Fourie, and he's proven at exactly this C&D. If you weight the ~40% speed pillar and the C&D bonus literally, he tops it.`},
+      {t:'p', h:`I'm still coming down narrowly on <strong>IMILENZEYOKUDUDUMA (5)</strong>, for three reasons the method also bakes in: (1) his D-collateral is current and genuine — three weeks ago he finished ahead of Field Marshal, Tenpenny and La Pulga at these sorts of weights, running on each time; (2) he's dropping 2400→2200 with stamina in hand and a “best work late” note; and (3) pace — with Otto Luyken (and Royal Edition/Tenpenny) wanting to be forward in a 13-runner 2200m, this should be truly run, which is exactly what cooks a tiring, top-weighted front-runner and sets up the closer. Otto Luyken's case rests almost entirely on one 52-week-old figure, and his recent comments (“set pace-tired late,” ×several, 61.5kg) are the warning the trajectory pillar exists to catch.`},
+      {t:'vp', k:"Verdict", h:`IMILENZEYOKUDUDUMA (5) → OTTO LUYKEN (12) → FIELD MARSHAL (7), with TENPENNY (4) and LA PULGA (10) each-way, and MAGIC VERSE (3) the one to respect-but-take-on (must transfer Cape form first try; no coastal run this prep). If you're a pure-clock purist, swap the top two — that's the honest call in this race.`},
+      {t:'fades', h:`TINTIN (2) — the “won impressively over a mile” hype is real but it's a T-1600 (altitude) and this is 600m further than he's ever gone; his one coastal run (D-1400) was a well-beaten 9th. Hard stamina fade despite the market. WORLD OF ALICE (6) — weakens badly beyond a mile, no coastal form. TOMYRIS (8) — MR93, 1750m ceiling, outclassed. ROYAL EDITION (9) — MR93, all-Highveld placer. DIWALI ROCKET (11) — MR86, first course run, wide draw. JOHNNY THE THIEF (1) — has the only other real D-2200 clock (~par) but was 2.4L behind Otto Luyken running it, MR94, and “trainer's only runner” is thin.`}
+    ]
+  },
+
+  { no:4, mark:"claret",
+    title:"Grade 3 Durban Gold Vase",
+    meta:["3000m","Grade 3","Greyville (D-turf)","par 194.2"],
+    pick:{variant:"standout", flag:"Standout", rk:"#5", horse:"Ahead Of The Facts", num:"(10)",
+      line:"Best current Durban-stayer form plus a ‘running on’ step-up note, into a pace shape that suits the closer."},
+    body:[
+      {t:'lp', k:"Surface", h:`the Gold Vase, all the relevant form is D-coded, and it's the July card — D-turf, high confidence.`},
+      {t:'p', h:`Marathon staying race, 13 declared (Curious Girl 1 scratched — she reappears in the July). The method here is brutal on Highveld raiders: a fast Turffontein/Vaal marathon clock is altitude-flattered and does not transfer to a true coastal 3000m. Three coastal trials anchor the form — last year's Gold Vase (25.07.05 & 24.07.06 D-3000), plus two recent D-2400s (Lonsdale 26.05.30 on <em>good</em> ground, and the Winter Stayers 26.06.13 on <em>yielding</em>, which is why that lot's raw times look ~4s slower — a going effect, not a class one).`},
+      {t:'table',
+        head:["Horse","Wt","Coastal (D-turf) staying form, wt-adj","Note"],
+        cls:["c-horse","c-mono","c-note","c-note"],
+        rows:[
+          ["AHEAD OF THE FACTS (10)","58.5","D-2400 2nd “running on” (149.8 → adj 149.45, good); 3rd in this race last yr; K-2500 & 2800 wins","Best current form + the “running on at 2400m” step-up signal for 3000m; Fourie; well-weighted; fav"],
+          ["SHOOT THE RAPIDS (8)","60.0","2nd in this exact race (24.07.06 D-3000, beaten 0.40L) + 4th; D-2400 3rd “set pace-stayed on” (adj 153.85, yielding)","Best actual 3000m coastal result; placed last 3; MR117 — but a front-runner"],
+          ["HOLDING THUMBS (4)","60.0","2nd in this race last yr (25.07.05 D-3000); K-2500 wins; D-2400 7th last (adj 154.35, yielding)","Highest MR (119), C Little (marathon man), proven 3000m — but modest last run + top weight"],
+          ["MASTER REDOUTE (3)","60.0","D-2400 4th “stayed on” (adj 153.95, yielding); K-2800 4th “stayed on”","Consistent, 2kg better off w/ Shoot the Rapids; but a chronic placer (5 wins/31)"],
+          ["VIHAAN'S BOMB (13)","52.5","D-2400 WIN last start “moved up, easy” (152.2 off 62.0 → adj 151.25 at 52.5 today)","9.5kg lighter than that win, staying on, Yeni — value flyer. Knock: MR86, class rise, 3000m unproven"]
+        ]},
+      {t:'lp', k:"Verdict", h:`genuinely tight at the top, and the tiebreaker is pace. Poets Warrior (Highveld pacesetter, “tired late” on repeat) and front-running Shoot the Rapids both want the lead — a truly-run 3000m is likely, which is gold for the closers who finish over the top. That's exactly <strong>AHEAD OF THE FACTS (10)</strong>: the horse with the “running on” note, best weighted of the front trio, 3rd in this race last year, Fourie up. His profile and the pace shape both point his way, so he's my narrow top.`},
+      {t:'p', h:`Then SHOOT THE RAPIDS (8) — the best actual coastal-3000m result in the field (Gold Vase 2nd, 0.40L) and staying on last start; only mild concern is that he sets the pace into a race with another pacemaker. HOLDING THUMBS (4) completes it on class (MR119) and a Gold Vase 2nd, though 60kg and a flat last run keep him third. MASTER REDOUTE (3) and VIHAAN'S BOMB (13) are the each-way plays — and I'd single out Vihaan's Bomb as method-value the 20/1 underrates: a fresh coastal 2400m win, dropping to 52.5, adjusting to ~151.25. His only real questions are class and the extra 600m.`},
+      {t:'vp', k:"Verdict", h:`AHEAD OF THE FACTS (10) → SHOOT THE RAPIDS (8) → HOLDING THUMBS (4), each-way MASTER REDOUTE (3) and VIHAAN'S BOMB (13).`},
+      {t:'fades', h:`TITANS OF WAR (2) — the market trap: light 54.0 + a fast 2400 (149.4) will pull money, but that's a <strong>Vaal</strong> clock and he has 0 coastal runs — textbook raider fade. TAXHAVEN (5) — 100% Highveld, well-beaten, the guide itself says “others preferred.” POETS WARRIOR (11) — Turffontein pacesetter, “faded/tired late” recurring, stamina at true 3000m suspect. SON OF RAJ (12) — MR116 on paper but troubled/well-beaten coastal runs. DOUGLAS DRAGON (9), THE MIKADO (7), CHILL IN THE AIR (6) — either mostly-Highveld or coastal-but-outclassed (MR78–89).`},
+      {t:'aside', h:`same top three (AoF → Shoot → Holding) — independent agreement is a good sign. Two differences I'd add: (1) I'd frame AoF's win case as pace-driven (he's the closer who profits from a Shoot/Poets Warrior duel) and note Shoot's front-running as a live risk; (2) I'd promote VIHAAN'S BOMB into the each-way conversation — a fresh coastal staying win at 52.5 is a bigger method flag than 20/1 implies.`}
+    ]
+  },
+
+  { no:5, mark:null,
+    title:"Grade 2 Amusnet Golden Slipper",
+    meta:["1400m","Grade 2 · 2yo fillies","Greyville","par 84.0"],
+    pick:{variant:"plain", flag:"Top pick", horse:"Alice B Toklas", num:"(7)",
+      line:"Won the D-turf Devon Air trial going away; fastest coastal turf 1400m, proven C&D, Fourie."},
+    body:[
+      {t:'lp', k:"Surface", h:`the key trial (Devon Air) was D-turf and it's the July card — I'll treat as D-turf, but there's one real poly-dependent bomb below, so worth confirming.`},
+      {t:'p', h:`14 fillies, nearly all at 60.0 so weight-adjustment is a non-factor — this is a pure raw-time-plus-form 2yo race. The whole form revolves around the Devon Air Stakes (26.06.06, D-turf 1400m), the fillies' championship trial four weeks out:`},
+      {t:'table',
+        head:["Horse","Wt","Coastal 1400m form (raw)","Note"],
+        cls:["c-horse","c-mono","c-note","c-note"],
+        rows:[
+          ["ALICE B TOKLAS (7)","60.0","Devon Air WINNER 86.0 “going away” (beat Royal Tiara 1.80L)","Fastest coastal turf 1400m, proven exact trip, Fourie, C&D winner. Clear top"],
+          ["ROYAL TIARA (3)","60.0","Devon Air 2nd 86.4 “overraced-switch 300”","Beaten only by ABT and didn't settle → room to improve; C Murray"],
+          ["FERRARI FLAIR (4)","60.0","Devon Air 3rd 86.5 “stayed on”","The staying-on note is a genuine 1400m positive; only 2.3L off the win"],
+          ["PALACE OF ARVERNIA (13)","60.0","D-1200 WIN 74.2 “cruised”; S-1200 4th “stayed on”","Progressive (2 runs), coastal winner “on the upgrade” — but 1400m unproven"],
+          ["TOO FAST TO FIESTA (5)","60.0","D-1200 WIN 74.4 “cruised”","Coastal win, Fortune, but no 1400m form"],
+          ["AMC ROY'S FANTASY (8)","60.0","G-poly 1400m WIN 83.2 “going away”","Fastest coastal 1400 raw of anyone — but on poly. Turf form modest"],
+          ["TUDOR ROSE (2)","60.0","1 run: S-1200 maiden win 69.1 “green-got up”","Blinkers on, “could be anything,” Lerena — unknowable on stats"]
+        ]},
+      {t:'lp', k:"Verdict", h:`<strong>ALICE B TOKLAS (7)</strong> is the clean method top — she won the D-turf championship trial going away, owns the fastest coastal turf 1400m in the field, is proven at the exact distance and course, and has Fourie. ROYAL TIARA (3) is the obvious danger: beaten a length-and-three-quarters by ABT in that same trial but overraced (didn't settle), so there's improvement to come with a cleaner run.`},
+      {t:'p', h:`For third I land a shade differently from the handoff. <strong>FERRARI FLAIR (4)</strong> was 3rd in the Devon Air and — critically — “stayed on,” which is the exact distance-fit signal the method rewards for a filly who wants every yard of 1400m; she has real turf 1400m form, unlike the alternatives. PALACE OF ARVERNIA (13) is the lovely “still on the upgrade” progressive type, but she's on trust for the trip (max 1200m), so I have her as the each-way improver rather than a confident third.`},
+      {t:'p', h:`The wildcard I'd add: <strong>AMC ROY'S FANTASY (8)</strong> clocked 83.2 over 1400m — but on poly (G). If this race is run on the poly, she's the fastest coastal miler-type in the field at 50/1 and a serious each-way play; on turf, discount her. That's the single reason to nail the surface here.`},
+      {t:'vp', k:"Verdict", h:`ALICE B TOKLAS (7) → ROYAL TIARA (3) → FERRARI FLAIR (4), with PALACE OF ARVERNIA (13) the progressive each-way, AMC ROY'S FANTASY (8) the poly bomb, and TUDOR ROSE (2) the Lerena/blinkers unknown that pure stats can't price (respect, don't rely on).`},
+      {t:'fades', h:`VOLCANIC HEAT (6) — 100% Highveld, 0 coastal, unproven 1400m. VIKING LASS (11) — Highveld/variant, no coastal. GUILD THE LILLY (9) — 0-0-0, well-beaten everywhere (incl. 10th in the Devon Air). NO DRAMA (12) — mostly Highveld, T-1400 form is altitude. RUSHING CHIMES (1) — 7th in the Devon Air, outclassed by the 1-2-3.`},
+      {t:'aside', h:`agree on ABT → Royal Tiara at the top. I put FERRARI FLAIR 3rd (actual D-turf 1400m form, “stayed on”) ahead of PALACE OF ARVERNIA (unproven at the trip), where the handoff had them reversed — a real, defensible split. And I'd flag AMC ROY'S FANTASY as a poly-dependent live outsider the handoff didn't mention.`}
+    ]
+  },
+
+  { no:6, mark:"claret",
+    title:"Grade 2 Omoda Golden Horseshoe",
+    meta:["1400m","Grade 2 · 2yo colts","Greyville","par 84.0"],
+    pick:{variant:"standout", flag:"Standout", rk:"#3", horse:"Vibe Check", num:"(1)",
+      line:"The only colt unbeaten over 1400m, only sub-par coastal clocks, already beat the main dangers."},
+    body:[
+      {t:'lp', k:"Surface", h:`the colts' trial (Gatecrasher) was D-turf, July card — D-turf most likely, with one poly angle noted below. All runners ~60.0, so again raw-time-and-form, no weight play.`},
+      {t:'p', h:`The colts' championship trial is the Gatecrasher Stakes (26.06.06, D-turf 1400m), and separately there's a strong July-Prep 1400m series (E-strip, a Greyville configuration — coastal) that the favourite has been winning.`},
+      {t:'table',
+        head:["Horse","Wt","Coastal 1400m form (raw)","Note"],
+        cls:["c-horse","c-mono","c-note","c-note"],
+        rows:[
+          ["VIBE CHECK (1)","60.0","Unbeaten at 1400m: 83.4 & 84.7 (both WON); beat Kazenoyoni & Riff Raff Boy","Only sub-par 1400 clock in the race, winning trajectory, Veale, hat-trick bid. Clear top"],
+          ["KAZENOYONI (10)","60.0","Gatecrasher 2nd 86.5 (D-turf, 0.80L); 2nd to Vibe Check at 1400 (83.8)","Fastest actual D-turf 1400 among the colts; consistent, Fortune"],
+          ["RED SPICE (7)","60.0","K-1200 wins (~71s); 1 troubled D-1200 (3rd, injury)","Fast Cape sprinter, de Melo — but no 1400m form, 1 coastal run, 12-wk break"],
+          ["GREEN ENERGY (8)","60.0","G-poly 1400 WIN 85.3; but Gatecrasher 10th 87.3","Genuine coastal 1400 win — flopped last start though. Erratic"],
+          ["COAST OF THE SUN (17)","60.0","D-turf 1400 WIN 85.8","Real coastal 1400m win at 50/1 — outclassed on time but a place flyer"],
+          ["RIFF RAFF BOY (4)","60.0","E-1400 3rd 84.2 (behind VC); D-1400 win 87.5; Gatecrasher 5th","Proven at trip but consistently behind VC/Kazenoyoni — outclassed"]
+        ]},
+      {t:'lp', k:"Verdict", h:`<strong>VIBE CHECK (1)</strong> is the standout and the method loves him — he's the only colt unbeaten over 1400m (two wins), owns the only at/under-par coastal 1400 clocks (83.4, 84.7), has already beaten the two main dangers, carries a rising-star trajectory and Veale, and goes for the hat-trick. Textbook top pick.`},
+      {t:'p', h:`KAZENOYONI (10) is the solid each-way: 2nd in the genuine D-turf Gatecrasher (the fastest actual D-1400 among these colts) and 2nd to Vibe Check at 1400m — consistent, reliable, Fortune.`},
+      {t:'p', h:`Third is where I'll be honest about a method split. The handoff went RED SPICE, and he's a genuine talent (fast Cape sprint form, unbeaten under de Melo). But run him through the pillars: he has zero 1400m form (max 1200m), only one Greyville run (a troubled 3rd), and a 12-week layoff — he scores poorly on the two biggest non-trajectory pillars (speed-at-distance and distance-fit) precisely because he's being asked to prove the trip and the track and his freshness all at once. On strict method he sits behind the horses with actual coastal 1400m form. So independently I'd rank him level-with-to-below GREEN ENERGY (real coastal 1400m win, but erratic) and COAST OF THE SUN (real D-turf 1400m win, 50/1).`},
+      {t:'p', h:`I'll still name RED SPICE (7) third on the strength of his raw class + de Melo's booking — but with the explicit flag that he's on trust for the trip, and that a pure-stats read would slot a proven-1400m horse (Green Energy on poly, or Coast of the Sun on turf) into that spot instead. RIFF RAFF BOY (4) is the proven-trip-but-outclassed saver.`},
+      {t:'vp', k:"Verdict", h:`VIBE CHECK (1) → KAZENOYONI (10) → RED SPICE (7, on trust for the trip), with GREEN ENERGY (8) and COAST OF THE SUN (17) as the coastal-1400-form each-way alternatives I'd take ahead of Red Spice on strict method.`},
+      {t:'fades', h:`THE CULLINAN (2) — the 6/1 co-second-favourite, all-Cape, 0 Greyville, no 1400m form (max 1200m), shipping to Durban + stretching trip simultaneously — the signature raider fade despite Fourie. PRAYERSANDPROMISES (12) — 100% Turffontein, altitude-flattered 1400 times, 0 coastal. ST HARRY (11) — respected at 11/2 but a 22-week layoff, 0 coastal, and a 1000→1400m stretch off that break: Filter 2 kills it. NIGHTSHINE (15), SANDS OF VALHALLA (16) — Highveld/variant, 0 coastal, unproven trip.`},
+      {t:'aside', h:`agree on Vibe Check → Kazenoyoni. My genuine divergence is Red Spice at 3rd — I keep him there only on class/jockey and flag hard that the method's distance-fit and coastal-form pillars don't support it over a proven-1400m horse; I'd rather have Green Energy / Coast of the Sun third on strict stats. Same recurring theme as the whole card: the market floats trip-and-track-unproven types on class or Cape/Highveld speed, and the method fades them for the Greyville-proven runners.`}
+    ]
+  },
+
+  { no:7, mark:"claret",
+    title:"Grade 1 Hollywoodbets Durban July",
+    meta:["2200m","Grade 1 · the feature","Greyville (turf)","par 137.6"],
+    pick:{variant:"standout", flag:"Standout", rk:"#2", horse:"Native Ruler", num:"(10)",
+      line:"The only runner with a genuine Greyville-2200 time (sub-par), plus a D-2400 win three weeks ago."},
+    body:[
+      {t:'p', h:`Twenty declared, 3 (The Ultimate King) and 4 (Star Major) scratched. Standard July pattern is playing out: the ratings/market lean on LEGAL COUNSEL (5, MR128) and a Turffontein battalion (Hazy Dazy, Olivia's Way, Aladdin's Lamp, Choisaanada) whose clocks are altitude-flattered — a big deal at a true 2200m. The method fades the flat-track raiders and rides the KZN-prepped horses with real coastal turf form at the trip.`},
+      {t:'p', h:`The single most important line in the whole card: <strong>NATIVE RULER (10)</strong> is the only runner with a genuine Greyville 2200m time — he ran in last year's July (135:0), and weight-adjusted to today that's 135.45, under par 137:6 — plus he won the D-2400 three weeks ago, “cruised in,” beating Imilenzeyokududuma. Proven trip, fastest real 2200m clock, fresh, KZN. That's the profile the system is built to find.`},
+      {t:'table',
+        head:["Horse","Wt","Coastal (D-turf) form at/near trip","Note"],
+        cls:["c-horse","c-mono","c-note","c-note"],
+        rows:[
+          ["NATIVE RULER (10)","58.5","D-2200 135:0 (adj 135.45, sub-par); D-2400 win 3wks ago","Only genuine 2200m time in field; proven 2400m; MR121, Snaith/de Melo"],
+          ["WISH LIST (7)","54.5","D-2000 WIN, “ran on/got up late”","Unbeaten at Greyville, ideal step-up signal, light, Snaith, MR 90s→117"],
+          ["ISIVIVANE (1)","52.0","D-1900 WIN “fought hard”","MR rocketing 95→108, feather 52kg; only proven to 1950m (300m step)"],
+          ["REGULATION (2)","52.0","D-1900 2nd to Isivivane (wide, beaten 0.60)","Staying rallies, 52kg, Cape 1800 wins, top intl jockey"],
+          ["NOTE TO SELF (11)","55.0","D-2000 122.3 adj — fastest of the 2000m group","Same-day clock beat Wish List/Minogue by ~3s; well-in, K-2000 win"],
+          ["MINOGUE (16)","56.0","D-2000 2nd, beaten 0.05 to Wish List (adj 125.2)","Wish List's shadow, drops 4kg, 9 C&D, mare stays"],
+          ["CURIOUS GIRL (20)","52.0","D-2400 2nd (beaten 0.25) + D-2400 3rd","Proven coastal stayer dropping to 2200m, 52kg, MR80→100 improver"]
+        ]},
+      {t:'lp', k:"A raw-time wrinkle to be honest about", h:`on 26.05.30 there were two D-2000 races on the same day/track — so they are comparable. The DlyNw race (Note To Self 122.3 adj, Viva's Liberte 122.3 adj) was run ~3s faster than the Wlvng race that Wish List/Minogue contested (125.2–125.3 adj). Strict raw-time says Note To Self and Viva's Liberte out-clocked Wish List. The counter is that Wish List won her heat, “got up late,” and beat Note To Self and Viva's Liberte in the K-2000 Derby collateral — and the Wlvng race looks tactically slow (“pace-drop rein 100m”). Net: I still rate Wish List on the win + step-up signal, but Note To Self (11) is a strong well-in each-way on the faster clock, and Viva's Liberte (9) a live outsider on time + a 7kg weight drop.`},
+      {t:'vp', k:"Verdict", h:`NATIVE RULER (10) → WISH LIST (7) → ISIVIVANE (1), with REGULATION (2), NOTE TO SELF (11) and MINOGUE (16) each-way, and CURIOUS GIRL (20) the light-weight value/place flyer (genuine D-2400 form, 52kg, stamina in hand at 2200m). MOCHA BLEND (13) the “dark horse” saver — her Gr1 Summer Cup was Highveld (discount) but she backs it with real D-2000 form and is crying out for further.`},
+      {t:'lp', k:"Against the market", h:`LEGAL COUNSEL (5) — MR128 and a super D-1600 Gr1 second (beaten 0.05), but 2200m is 600m beyond his best trip and he shoulders 62.0kg top weight; the class is real, the trip and weight are the method's exit. KING PELLES (17) — proven D-stayer (D-3200 Gold Cup win, “no stamina doubts”), but no sharp middle-distance coastal time and 59kg; each-way only if the pace is strong.`},
+      {t:'fades', h:`Highveld raiders, altitude clocks, no coastal form: HAZY DAZY (6) — all-Highveld, her only coastal try was a D-2000 8th beaten 11.4L, MR117 irrelevant here. OLIVIA'S WAY (15) — 100% Turffontein, perennial placer, last win 62 wks ago. ALADDIN'S LAMP (18) — genuine stayer but 100% Highveld, altitude marathon times don't transfer. CHOISAANADA (19) — 100% Highveld + 10-wk break.`},
+      {t:'lp', k:"Pace / shape", h:`with Isivivane handy, Viva's Liberte and Legal Counsel wanting to be forward, a truly-run 2200m is likely — which is gold for the closers/stayers (Native Ruler, Wish List, Curious Girl “kept finding,” Mocha Blend).`}
+    ]
+  },
+
+  { no:8, mark:"claret",
+    title:"Garden Province Stakes (Grade 1)",
+    meta:["1600m","Grade 1","Greyville","par 97.0"],
+    pick:{variant:"standout", flag:"Standout", rk:"#1", horse:"Double Grand Slam", num:"(10)",
+      line:"Defending champion, fastest reliable Durban mile, beat her main rival at level weights over C&D."},
+    body:[
+      {t:'p', h:`The two Durban-turf mile winners from last year's July meeting are both back, and they finished 1-2 in this very race:`},
+      {t:'table',
+        head:["Horse","Wt","Best D 1600m (wt)","→ today","Note"],
+        cls:["c-horse","c-mono","c-mono","c-mono","c-note"],
+        rows:[
+          ["DOUBLE GRAND SLAM (10)","60.0","96:0 (60.0, won)","96.00","defending champ, top-rated 125"],
+          ["MON PETIT CHERIE (6)","60.0","96:2 (59.0, 2nd)","96.10","2nd in this race last yr, rated 117"],
+          ["QUICKSTEPGAL (7)","59.0","97:5 (60.0, 2nd)","97.40","progressive 3yo, won last start"],
+          ["KEUKENHOF (8)","59.0","97:5 (60.0, 3rd)","97.40","consistent, ran behind QSG"]
+        ]},
+      {t:'lp', k:"Collateral seals it", h:`On 25.07.05 (D, 1600m — last year's meeting), DOUBLE GRAND SLAM beat MON PETIT CHERIE by ~0.8L at level weights, and they're level again today. DGS also owns the fastest reliable Durban mile in the field (96:0, same weight). She's the one to beat regardless of surface.`},
+      {t:'vp', k:"Verdict", h:`DOUBLE GRAND SLAM (10) top → MON PETIT CHERIE (6) → QUICKSTEPGAL (7), with KEUKENHOF (8) the each-way saver. QSG (3yo, recent D-mile form, won last, beat KEUK on collateral) is the improver who could split the older pair.`},
+      {t:'fades', h:`WHISTLE THE TUNE (4) and RODEO DRIVE partly (sprint/Highveld profiles into a Gr1 mile), KISSHOTEN (11, all-Turffontein raider, no KZN prep), RAINBOW LORIKEET (below par), LOU LOU (1, MR73 — outclassed by 40+ points).`}
+    ]
+  },
+
+  { no:9, mark:"brass",
+    title:"Post Merchants (Grade 3)",
+    meta:["1200m","Grade 3","Greyville","par 71.2"],
+    pick:{variant:"value", flag:"Method-value", horse:"Cafe Culture", num:"(13)",
+      line:"Fastest genuine coastal 1200m in the field with a coughing excuse — the play against the flattered favourite."},
+    body:[
+      {t:'p', h:`This is where raw-time-on-consistent-tracks earns its keep. The market horse is BUFFALO STORM CODY (9) — rated 132, “champion sprinter,” blazing Turffontein times (67:3). But: those are altitude times, he has zero KZN prep, and he's fresh off a 10-week rest first-up at Greyville. Every one of the fade-flags lights up.`},
+      {t:'p', h:`Meanwhile the fastest coastal 1200m in the field came from the big Scottsville contest on 26.05.23:`},
+      {t:'table',
+        head:["Horse","Wt","S 1200m (wt that day)","→ today","Note"],
+        cls:["c-horse","c-mono","c-mono","c-mono","c-note"],
+        rows:[
+          ["CAFE CULTURE (13)","60.0","67:1 (58.0, 2nd, coughing)","67.30","KZN-prepped, “looked a winner last time”"],
+          ["ONE EYE ON VEGAS (11)","58.0","67:2 (54.5, 3rd)","67.55","improving 3yo"],
+          ["ZIYASHA (10)","60.0","67:4 (58.0, 5th)","67.60","fast, versatile"],
+          ["KAALVOET (1)","56.0","67:2 (52.0, 4th, ran on)","67.60","light 3yo, Gr2 finish"],
+          ["TENANGO (5)","62.0","67:3 (58.0, won)","67.70","genuine sprinter but top weight"]
+        ]},
+      {t:'p', h:`CAFE CULTURE ran the fastest true-coastal split of any runner here, while coughing and finishing 2nd — a legitimate excuse — off a fair weight, fully acclimatised. On the system that's the pick.`},
+      {t:'vp', k:"Verdict", h:`CAFE CULTURE (13) top → KAALVOET (1, light, progressive) → TENANGO (5, class + genuine sprint speed, but 62kg) → ONE EYE ON VEGAS (11) / PRINCESS OF GAUL (3, light 3yo, Gr1-placed).`},
+      {t:'lp', k:"The honest caveat", h:`BUFFALO STORM CODY (9) is 10+ points clear on ratings. If he handles Greyville first-up, class wins and the method looks brave. But that's exactly the unprepped-raider bet the rules are built to oppose — I'm taking him on, not with him. DAVE THE KING (7, 128) is a miler dropping to a sprint off 62kg — trip query. This is a genuinely open heat; play it accordingly.`}
+    ]
+  },
+
+  { no:10, mark:"claret",
+    title:"Premier Gateway Int'l (Listed Hcp)",
+    meta:["1600m","Listed Handicap · AMR-102","Greyville","par 97.0"],
+    pick:{variant:"standout", flag:"Standout", rk:"#4", horse:"Mohave Prince", num:"(2)",
+      line:"The cleanest profile on the card — progressive 3yo, fast D-mile win, light, hat-trick bid."},
+    body:[
+      {t:'p', h:`Turf lean. Best reliable Durban-turf miles, weight-adjusted:`},
+      {t:'table',
+        head:["Horse","Wt","Best D 1600m (wt)","→ today","Note"],
+        cls:["c-horse","c-mono","c-mono","c-mono","c-note"],
+        rows:[
+          ["MOHAVE PRINCE (2)","55.5","96:8 (57.5, won)","96.60","3yo, 2-from-3 at trip, hat-trick bid"],
+          ["IMPOSING (7)","59.5","95:7 (54.0, won)","96.25","consistent, versatile (D+G form)"],
+          ["JP'S PALACE (14)","55.5","96:8 (E, 58.5, 2nd)","96.50","light, “beaten narrowly last 3”"],
+          ["WINTER GAMES (9)","57.5","94:2 (Dn, 60.0, won)","~94.0*","fast but inconsistent (*night-meeting time, caution)"]
+        ]},
+      {t:'p', h:`MOHAVE PRINCE (2) is the cleanest profile on the card: a progressive 3yo, two wins from three at the mile, a fast Durban-turf win, light on 55.5kg, and in-form chasing a hat-trick. IMPOSING (7) is the consistent fast-timer and the safety net.`},
+      {t:'lp', k:"Poly pivot", h:`if this is on G, add GIMMEFABULOUS (10) loudly — she ran 95:7 over 1600m on the poly carrying 62.5kg and drops to 56.5kg today (→ ~94.9 equiv, a 6kg swing in her favour). That's the standout well-in horse if the surface is poly. VAPOUR TRAIL (6) also won on the poly last time but has a mile query.`},
+      {t:'vp', k:"Verdict (turf)", h:`MOHAVE PRINCE (2) → IMPOSING (7) → WINTER GAMES (9, talent but erratic — place value), with JP'S PALACE (14) each-way. Step-up watches: TALK TO THE MASTER (4, the “running on” D-1400m note backs the mile) over GREEN GATEWAY (5, all speed, no mile form).`},
+      {t:'fades', h:`raiders, no KZN prep: MONEY HEIST (8, Highveld), CAPTAIN WEST (11, Cape + first-up new yard), PAY THE PALACE (12, Cape), LANDOFTHERISINGSUN (15, Cape stayer dropping to a sharp mile).`}
+    ]
+  },
+
+  { no:11, mark:null,
+    title:"Coast Middle Stakes (F&M)",
+    meta:["1200m","Fillies & Mares","Greyville","par 71.2"],
+    pick:{variant:"plain", flag:"Top pick", horse:"Buttercup Baby", num:"(3)",
+      line:"The most rounded — top-rated, a Greyville-poly C&D win, fully KZN-prepped, −1.5kg claim."},
+    body:[
+      {t:'p', h:`Poly-form-heavy field. Best coastal/poly 1200m adjusted:`},
+      {t:'table',
+        head:["Horse","Wt","Best coastal 1200m (wt)","→ today","Note"],
+        cls:["c-horse","c-mono","c-mono","c-mono","c-note"],
+        rows:[
+          ["ONE SMART COOKIE (6)","60.0 (−1.5)","67:8 (S, 58.5, won)","~67.8","fastest true-coastal split; “yet to place at Greyville”"],
+          ["BUTTERCUP BABY (3)","61.5 (−1.5)","69:9 (G, 57.0, won)","~70.2","top-rated 103, C&D poly win, fully prepped"],
+          ["SOHOT SOWHAT (9)","58.5","81:9 (G 1400, 58.5)","—","best MR 101 racing off 91, fitter 2nd-up"],
+          ["SERENGETTI SUN (2)","58.5","68:3 (S, 58.5)","68.30","improving 3yo, high rating for weight"]
+        ]},
+      {t:'p', h:`BUTTERCUP BABY (3) is the most rounded: top-rated, a Greyville-poly 1200m win (course-and-distance proven), fast Scottsville sprints behind it, fully KZN-prepped, and a −1.5kg claim. ONE SMART COOKIE (6) posted the quickest adjusted coastal time but carries the “yet to place on this course” asterisk. SOHOT SOWHAT (9) is the well-in class angle — 10lb below her best mark and stripping fitter second-up.`},
+      {t:'vp', k:"Verdict", h:`BUTTERCUP BABY (3) top → ONE SMART COOKIE (6) → SOHOT SOWHAT (9), with SERENGETTI SUN (2) each-way. Turf watches: WARRIOR ROYALE (10, D-sprint speed but 61.5kg) and HAPPY FORTUNE (14, in-form Greyville winner but dropping from 1400 and rising in class).`},
+      {t:'fades', h:`Highveld raiders, no prep: CAPTAIN SELVIE (4 — on a hat-trick but all-Turffontein, altitude times, first-up at Greyville), WARM RECEPTION (7, T-only + trip-sharp), ANCHORAGE (1, J/T-only + 61.5 top weight).`}
+    ]
+  },
+
+  { no:12, mark:"claret",
+    title:"Metro FM Class 4 (F&M)",
+    meta:["1200m","Class 4 · Fillies & Mares","Greyville","par 71.2"],
+    pick:{variant:"standout", flag:"Standout", rk:"#6", horse:"Sign Of Fate", num:"(7)",
+      line:"Won this exact C&D last start and clearly well-in off 78, Zackey retained."},
+    body:[
+      {t:'p', h:`Loaded with Greyville-poly-proven fillies. Best adjusted 1200m:`},
+      {t:'table',
+        head:["Horse","Wt","Best 1200m (wt)","→ today","Note"],
+        cls:["c-horse","c-mono","c-mono","c-mono","c-note"],
+        rows:[
+          ["WEDDING VOW (13)","56.5","70:0 (G, 58.5, won)","69.80","unbeaten over C&D, light, class-rise query"],
+          ["CAPTAIN'S PRIDE (12)","58.5","69:2 (S, 54.5, 2nd, ran on)","69.60","fast closer from wide draw"],
+          ["SIGN OF FATE (7)","58.0","70:4 (G, 57.0, won)","70.50","won C&D last, MR90 off 78 (well-in), Zackey stays"],
+          ["POURSOMESUGARONME (1)","57.0","69:9 (G, 57.0)","69.90","consistent placer, blinkers ON"],
+          ["WHATASTAR (4)","58.0","70:4 (G, 56.0, won)","70.60","multiple G 1200m wins (C&D-proven)"]
+        ]},
+      {t:'p', h:`SIGN OF FATE (7) is the well-in pick: won over this exact C&D last start, races off 78 with a best mark of 90, and keeps Zackey. WEDDING VOW (13) is unbeaten over C&D on the poly with the fastest adjusted time and a light 56.5kg — the only knock is the class rise. Top-rated SIBERIAN WINTER (3) is in-form and consistent but drops from her pet 1400m, and the collateral says POURSOMESUGARONME (1) — beaten 0.05L by her last time and now ~1kg better off with blinkers added — can reverse it.`},
+      {t:'vp', k:"Verdict", h:`SIGN OF FATE (7) top → WEDDING VOW (13) → SIBERIAN WINTER (3), with CAPTAIN'S PRIDE (12), POURSOMESUGARONME (1) and THOUGHT CONTROL (9, “running on at finish” twice over C&D) all live each-way. A genuinely open Class 4.`},
+      {t:'fades', h:`CLAIR DE LUNE (6) — top-rated on paper but a Cape raider (all K/L form), no KZN prep, top weight 61.0. Classic fade.`}
+    ]
+  }
+];
+
+const bestBets = [
+  {no:"1", horse:"Double Grand Slam", race:"Race 8", why:"Defending Gr1 champion, fastest reliable Durban mile, beat her main rival at level weights. The most solid single of the meeting."},
+  {no:"2", horse:"Native Ruler", race:"Race 7 · the July", why:"The purest method horse on the card — the only genuine Greyville-2200 clock (sub-par), a D-2400 win three weeks ago, fresh and KZN-prepped."},
+  {no:"3", horse:"Vibe Check", race:"Race 6", why:"The only colt unbeaten at 1400m, fastest coastal clock in the race, and he has already beaten the main dangers head-to-head."},
+  {no:"4", horse:"Mohave Prince", race:"Race 10", why:"The cleanest handicap profile — progressive 3yo, fast D-mile win, light weight, chasing a hat-trick."},
+  {no:"5", horse:"Ahead Of The Facts", race:"Race 4", why:"Best current Durban-stayer form plus a “running on” step-up signal, into a pace shape that sets up the closer over the top."}
+];
+const droppedBets = [
+  {no:"6", horse:"Sign Of Fate", race:"Race 12", why:"Won this exact C&D and clearly well-in off 78, jockey retained. Highest-confidence Class 4 play — slipped just outside the five as the Grade horses firmed up."},
+  {no:"7", horse:"World Of Our Own", race:"Race 2", why:"Fastest weight-adjusted mile on either surface, surface-robust and improving, against a fadeable Cape favourite — held a top-five spot before the re-work."}
+];
+const valueAngles = [
+  {horse:"Cafe Culture", race:"Race 9", why:"Fastest coastal sprint time with a coughing excuse, against an altitude-flattered, unprepped market leader."},
+  {horse:"Imilenzeyokududuma", race:"Race 3", why:"In-form KZN stayer dropping in trip, taking on Highveld and Cape raiders reading off flattered clocks."},
+  {horse:"Vihaan's Bomb", race:"Race 4", why:"A fresh coastal 2400 win dropping to 52.5kg into a truly-run 3000m — a bigger method flag than 20/1 implies."}
+];
+
+const tabs = document.getElementById('tabs');
+const panel = document.getElementById('panel');
+
+races.forEach(r=>{
+  const b=document.createElement('button');
+  b.className='tab'+(r.mark?(' mark-'+r.mark):'');
+  b.textContent=r.no;
+  b.setAttribute('aria-label','Race '+r.no);
+  b.dataset.race=r.no;
+  b.addEventListener('click',()=>select(r.no));
+  tabs.appendChild(b);
+});
+const bb=document.createElement('button');
+bb.className='tab best';
+bb.textContent='Best Bets';
+bb.dataset.race='best';
+bb.addEventListener('click',()=>select('best'));
+tabs.appendChild(bb);
+
+function setActive(key){
+  document.querySelectorAll('.tab').forEach(t=>{
+    const on=t.dataset.race===String(key);
+    t.classList.toggle('active',on);
+    t.setAttribute('aria-pressed',on);
+  });
+}
+
+function renderBody(blocks){
+  return blocks.map(b=>{
+    if(b.t==='p') return `<p class="bp">${b.h}</p>`;
+    if(b.t==='lp') return `<div class="note"><span class="k">${b.k}</span><p class="v">${b.h}</p></div>`;
+    if(b.t==='vp') return `<div class="note verdict"><span class="k">${b.k}</span><p class="v">${b.h}</p></div>`;
+    if(b.t==='fades') return `<div class="fades"><span class="k">Fades</span><p class="v">${b.h}</p></div>`;
+    if(b.t==='aside') return `<div class="aside"><span class="k">vs the handoff</span><p class="v">${b.h}</p></div>`;
+    if(b.t==='table'){
+      const head=b.head.map(h=>`<th>${h}</th>`).join('');
+      const rows=b.rows.map(r=>`<tr>${r.map((c,i)=>`<td class="${b.cls?b.cls[i]:''}">${c}</td>`).join('')}</tr>`).join('');
+      return `<div class="tw"><table class="ftab"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+    return '';
+  }).join('');
+}
+
+function renderRace(r){
+  const p=r.pick;
+  const flag=`<div class="flag">${p.rk?`<span class="rk">${p.rk}</span>`:''}${p.flag}</div>`;
+  const meta=r.meta.map(m=>`<span>${m}</span>`).join('<span class="sep">/</span>');
+  return `
+    <p class="r-eyebrow">Race ${r.no}</p>
+    <h2 class="r-title">${r.title}</h2>
+    <p class="r-meta">${meta}</p>
+    <div class="pick pick--${p.variant}">
+      ${flag}
+      <p class="pick-horse">${p.horse} <span class="num">${p.num}</span></p>
+      <p class="pick-line">${p.line}</p>
+    </div>
+    ${renderBody(r.body)}
+  `;
+}
+
+function renderBest(){
+  const rows=bestBets.map(b=>`
+    <div class="rank"><div class="no">${b.no}</div>
+    <div class="body"><p class="hn">${b.horse}<span class="rc">${b.race}</span></p><p class="why">${b.why}</p></div></div>`).join('');
+  const dropped=droppedBets.map(b=>`
+    <div class="rank rank--next"><div class="no">${b.no}</div>
+    <div class="body"><p class="hn">${b.horse}<span class="rc">${b.race}</span></p><p class="why">${b.why}</p></div></div>`).join('');
+  const angles=valueAngles.map(a=>`
+    <div class="angle"><span class="dot"></span>
+    <div><p class="an">${a.horse}<span class="rc">${a.race}</span></p><p class="aw">${a.why}</p></div></div>`).join('');
+  return `
+    <p class="r-eyebrow">The Card, Ranked</p>
+    <h2 class="r-title">Best Bets</h2>
+    <p class="bb-intro">Five to stand on, in confidence order — then two that held a place in an earlier five and slipped just outside in the re-work.</p>
+    ${rows}
+    <p class="subhead">Dropped from the five in the re-work</p>
+    <p class="subnote">Still strong — numbered on where they now sit.</p>
+    ${dropped}
+    <p class="subhead brass">Method-value angles — worth more than their price</p>
+    ${angles}
+    <div class="method-strip">The thread across the whole card: the market keeps floating <b>Turffontein and Kenilworth raiders</b> on fast-looking raw times. Read on a consistent track, weight-adjusted, the value sits heavily with the KZN-prepped locals.</div>
+  `;
+}
+
+function select(key){
+  setActive(key);
+  panel.classList.remove('panel');void panel.offsetWidth;panel.classList.add('panel');
+  if(key==='best'){panel.innerHTML=renderBest();}
+  else{panel.innerHTML=renderRace(races.find(r=>r.no===Number(key)));}
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+select('best');
+</script>
+</body>
+</html>
