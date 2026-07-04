@@ -108,6 +108,9 @@
     text-transform:uppercase;color:var(--turf);font-weight:600;display:block;margin-bottom:3px;}
   .note .v{font-size:15px;color:#2b3730;margin:0;}
   .note .v strong{color:var(--ink);font-weight:600;}
+  .nlist{margin:8px 0 0;padding-left:18px;}
+  .nlist li{font-size:14.5px;color:#2b3730;margin:0 0 9px;line-height:1.52;}
+  .nlist li strong{color:var(--ink);font-weight:600;}
   .note.verdict .k{color:var(--claret);}
   .note.verdict .v{font-weight:500;color:var(--ink);}
 
@@ -122,6 +125,8 @@
   .ftab tbody tr:nth-child(even){background:rgba(28,81,55,.03);}
   .c-horse{font-weight:600;color:var(--ink);white-space:nowrap;}
   .c-mono{font-family:'IBM Plex Mono',monospace;white-space:nowrap;color:var(--ink);font-size:12px;}
+  .c-fig{font-family:'IBM Plex Mono',monospace;color:var(--ink);font-size:12px;line-height:1.45;min-width:150px;}
+  .c-equiv{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--turf);font-size:12.5px;line-height:1.4;}
   .c-note{color:#4a5650;min-width:210px;line-height:1.45;}
 
   /* Fades + aside */
@@ -182,7 +187,6 @@
   <header>
     <p class="kicker">Greyville · Raw-Time Method · 12 Races</p>
     <h1 class="mast">Durban July,<br><em>on the clock.</em></h1>
-    <p class="standfirst">Twelve races read off the raw clock, not the market. Times are ranked only within the same track and trip, weight-adjusted at <b>0.1s per kilogram</b>, and Turffontein's altitude-flattered figures are set aside. Where the market floats a Highveld or Cape raider on a fast-looking time, the method fades it for a horse with genuine Greyville form.</p>
     <div class="legend">
       <span class="lg"><span class="swatch s-claret"></span> Standout bet</span>
       <span class="lg"><span class="swatch s-brass"></span> Method-value angle</span>
@@ -242,17 +246,19 @@ const races = [
       {t:'p', h:`Open-company mile, 13 runners (Deception Pass 13 scratched). The market is built around PLEASE BE TRUE (3) at 2/1 — and that's the first thing the method throws out. He's an all-Cape horse (K-form only), zero Greyville starts, C&D 0:0-0-0. Textbook raider fade of the favourite. Meanwhile the fastest genuine Greyville miler in the race is being offered at 10s.`},
       {t:'p', h:`Weight-adjusted 1600m times at 0.1s/kg, ranked within surface:`},
       {t:'table',
-        head:["Horse","Wt","Best coastal 1600m (adj)","Note"],
-        cls:["c-horse","c-mono","c-mono","c-note"],
+        head:["Horse","Wt today","Surface","Best 1600m raw (wt that day)","→ Today-equiv","Note"],
+        cls:["c-horse","c-mono","c-mono","c-fig","c-equiv","c-note"],
         rows:[
-          ["WORLD OF OUR OWN (7)","57.0","G 94.6 / 94.55; D 96.0","6 C&D runs (2 wins), fastest on both surfaces, MR 77→88 rocketing. “Include.”"],
-          ["IMPERIAL POWER (11)","57.0","G 95.2 (won)","Won the G-1600 BStks beating Sundance Kid; 10-wk break + up in wt off very light carries"],
-          ["SUNDANCE KID (12)","61.5","G 95.25","Fast, front-runner, 8 C&D — but top weight 61.5 and a perennial placer (6-6-3/39)"],
-          ["ROYAL SWORD (8)","57.0","G 95.25","3rd to WOOO at C&D; improving 3yo, Murray booked, “can go close”"],
-          ["GRAND OCCASION (4)","56.0","G 95.45 (won)","Front-running filly, well-in at 56, fast G-1600 poly times — but Cls4F→open"],
-          ["GREEN GLOW (6)","57.0","G 95.7","Improving young gelding, dual Greyville form, “can show”"]
+          ["WORLD OF OUR OWN (7)","57.0","G poly","95.1 (58.0)","94.90","fastest poly raw; also D-1600 96.0 (57.0)→96.00. Surface-robust"],
+          ["WORLD OF OUR OWN (7)","57.0","D turf","96.0 (57.0)","96.00","has an actual turf line too — rare in this field"],
+          ["IMPERIAL POWER (11)","57.0","G poly","94.8 (53.0, won)","95.20","won G-1600 off light 53.0; today +4kg. 10-wk break"],
+          ["SUNDANCE KID (12)","61.5","G poly","95.3 (57.5)","95.25","fast, but top weight 61.5 adds nothing back — perennial placer"],
+          ["ROYAL SWORD (8)","57.0","G poly","95.1 (60.5)","94.75","3rd to WOOO here; carried 60.5 that day so drops 3.5kg → big"],
+          ["GRAND OCCASION (4)","56.0","G poly","95.7 (55.5, won)","95.75","front-runner, well-in at 56; Cls4F→open a class rise"],
+          ["GREEN GLOW (6)","57.0","G poly","95.7 (57.0)","95.70","dual Greyville form, improving"],
+          ["PLEASE BE TRUE (3)","58.5","—","n/a (all K-form, 0 Greyville)","—","2/1 fav, raider fade"]
         ]},
-      {t:'p', h:`<strong>WORLD OF OUR OWN (7)</strong> is the method pick and it's clean: he clocks the fastest weight-adjusted 1600m in the field on either surface (G ~94.55 adj, D 96.0 adj — both under par), has 6 C&D runs with two wins, a strongly rising MR (77→88), sits well at 57.0kg, and the guide itself says “should have finished closer last time, include.” Surface-robust, which is exactly what you want when the header won't confirm the strip.`},
+      {t:'p', h:`<strong>WORLD OF OUR OWN (7)</strong> is the method pick and it's clean: he clocks the fastest weight-adjusted 1600m in the field on either surface (G ~94.90 adj, D 96.0 adj — both under par), has 6 C&D runs with two wins, a strongly rising MR (77→88), sits well at 57.0kg, and the guide itself says “should have finished closer last time, include.” Surface-robust, which is exactly what you want when the header won't confirm the strip.`},
       {t:'p', h:`Behind him it splits on surface. <strong>If poly (G):</strong> IMPERIAL POWER (11), SUNDANCE KID (12), GRAND OCCASION (4) and GREEN GLOW (6) all get a lift — Grand Occasion in particular is dangerous on the lead if it's poly, fast G-1600 times and 6kg-type well-in. <strong>If turf (D):</strong> World Of Our Own still tops (he has the D-run), Sundance Kid/Imperial Power's edge softens, and CAPSAICIN (10) and DIANI (9) come marginally into it on their turf/mixed form.`},
       {t:'vp', k:"Verdict", h:`WORLD OF OUR OWN (7) → IMPERIAL POWER (11) → SUNDANCE KID (12), with ROYAL SWORD (8) and GREEN GLOW (6) each-way, and GRAND OCCASION (4) a live poly saver.`},
       {t:'lp', k:"Pace note", h:`Grand Occasion, Capsaicin and Sundance Kid all want to lead — a genuine tempo suits the closer (World Of Our Own) even more.`},
@@ -270,15 +276,15 @@ const races = [
       {t:'p', h:`The whole race turns on one fact the method cares about more than anything else: only two runners have ever clocked a real Greyville 2200m — and they ran it in the same race. On 25.07.05 (D-2200), OTTO LUYKEN won it in 136:8 off 61.0kg; JOHNNY THE THIEF was 4th, 2.4L back, in 137:3 off 52.5kg. Weight-adjusted to today: Otto Luyken 136.85 (sub-par by ~0.75s), Johnny the Thief ~137.25 (par). Everyone else's stamina and time at the trip is inferred from adjacent distances.`},
       {t:'p', h:`By rating (AMR 101) the class shortlist is Otto Luyken 113 · Magic Verse 111 · Field Marshal 110 · Imilenzeyokududuma 109 · Tenpenny 107 · La Pulga 105 — and the handicap is tight and rating-consistent, so none of the light-weights are “well-in,” they're just lower-rated.`},
       {t:'table',
-        head:["Horse","Wt","Genuine coastal / 2200m form (wt-adj where rankable)","Note"],
-        cls:["c-horse","c-mono","c-note","c-note"],
+        head:["Horse","Wt today","Surface","Best relevant raw (wt that day)","→ Today-equiv","Note"],
+        cls:["c-horse","c-mono","c-mono","c-fig","c-equiv","c-note"],
         rows:[
-          ["OTTO LUYKEN (12)","61.5","D-2200 WIN 136:8 → 136.85 adj, sub-par; C&D 1:1-0-0","The only rankable sub-par exact-C&D winning clock in the race. R Fourie. But it's 52 wks old, and his last 5 read “set pace-tired late” under top weight, MR 116→113."],
-          ["IMILENZEYOKUDUDUMA (5)","59.5","D-2400 2nd, 1.05L to Native Ruler, “running on” (153:5); D-1800 4th “ran on from last”","Best current coastal form; dropping in trip, stamina in hand, “doing best work late.” Fair weight (5 below peak MR)."],
-          ["FIELD MARSHAL (7)","60.0","D-1800 5th “stayed on” (behind, but level with, Imi); won up to D-2400","Genuine Durban stayer, “should close.”"],
-          ["TENPENNY (4)","58.5","D-2400 5th, “jock amiss” (behind Native Ruler & Imi); won K-2500","Cape form but has 1 Greyville prep last start → partial forgiveness, not a raider fade."],
-          ["MAGIC VERSE (3)","60.5","all-K current form; 3rd in this race last year (C&D 1:0-0-1)","Top-3 rated but 100% Cape this campaign; 60.5kg. 1 course placing = respect, don't dismiss."],
-          ["LA PULGA (10)","57.5","D-1800 6th “not disgraced” (1st Durban run); K-1800 winner ×2","Improving 4yo (MR 95→105), Lerena, now has his coastal intro. Live e/w."]
+          ["OTTO LUYKEN (12)","61.5","D turf 2200","136.8 (61.0, won)","136.85","only sub-par winning exact-C&D clock; 52 wks old; “tired late” recently"],
+          ["JOHNNY THE THIEF (1)","52.0","D turf 2200","137.3 (52.5, 4th)","137.25","the only other real 2200 clock; was 2.4L behind Otto that day; MR94"],
+          ["IMILENZEYOKUDUDUMA (5)","59.5","D turf 2400","153.5 (57.0, 2nd “running on”)","153.75 (2400)","best current form; drops to 2200 w/ stamina in hand; no same-dist 2200 clock"],
+          ["FIELD MARSHAL (7)","60.0","D turf 1800","111.1 (58.0, 5th “stayed on”)","111.30 (1800)","genuine Durban stayer stepping up; no 2200 line"],
+          ["TENPENNY (4)","58.5","D turf 2400","153.8 (57.0, 5th, jock amiss)","153.95 (2400)","1 Greyville prep last start → partial forgiveness, not full raider"],
+          ["MAGIC VERSE (3)","60.5","—","n/a (all-K this prep; 3rd in this race last yr)","—","must transfer Cape form first try"]
         ]},
       {t:'lp', k:"Verdict — my independent read", h:`the top of this race is a genuinely close 1-2, and I want to be straight about the tension rather than paper over it. On the strictest raw-time reading, <strong>Otto Luyken (12) is #1</strong> — he owns the single most method-aligned fact in the field (the only weight-adjusted, sub-par, winning Greyville-2200m clock) plus R Fourie, and he's proven at exactly this C&D. If you weight the ~40% speed pillar and the C&D bonus literally, he tops it.`},
       {t:'p', h:`I'm still coming down narrowly on <strong>IMILENZEYOKUDUDUMA (5)</strong>, for three reasons the method also bakes in: (1) his D-collateral is current and genuine — three weeks ago he finished ahead of Field Marshal, Tenpenny and La Pulga at these sorts of weights, running on each time; (2) he's dropping 2400→2200 with stamina in hand and a “best work late” note; and (3) pace — with Otto Luyken (and Royal Edition/Tenpenny) wanting to be forward in a 13-runner 2200m, this should be truly run, which is exactly what cooks a tiring, top-weighted front-runner and sets up the closer. Otto Luyken's case rests almost entirely on one 52-week-old figure, and his recent comments (“set pace-tired late,” ×several, 61.5kg) are the warning the trajectory pillar exists to catch.`},
@@ -296,14 +302,15 @@ const races = [
       {t:'lp', k:"Surface", h:`the Gold Vase, all the relevant form is D-coded, and it's the July card — D-turf, high confidence.`},
       {t:'p', h:`Marathon staying race, 13 declared (Curious Girl 1 scratched — she reappears in the July). The method here is brutal on Highveld raiders: a fast Turffontein/Vaal marathon clock is altitude-flattered and does not transfer to a true coastal 3000m. Three coastal trials anchor the form — last year's Gold Vase (25.07.05 & 24.07.06 D-3000), plus two recent D-2400s (Lonsdale 26.05.30 on <em>good</em> ground, and the Winter Stayers 26.06.13 on <em>yielding</em>, which is why that lot's raw times look ~4s slower — a going effect, not a class one).`},
       {t:'table',
-        head:["Horse","Wt","Coastal (D-turf) staying form, wt-adj","Note"],
-        cls:["c-horse","c-mono","c-note","c-note"],
+        head:["Horse","Wt today","Surface","Best relevant raw (wt that day)","→ Today-equiv","Note"],
+        cls:["c-horse","c-mono","c-mono","c-fig","c-equiv","c-note"],
         rows:[
-          ["AHEAD OF THE FACTS (10)","58.5","D-2400 2nd “running on” (149.8 → adj 149.45, good); 3rd in this race last yr; K-2500 & 2800 wins","Best current form + the “running on at 2400m” step-up signal for 3000m; Fourie; well-weighted; fav"],
-          ["SHOOT THE RAPIDS (8)","60.0","2nd in this exact race (24.07.06 D-3000, beaten 0.40L) + 4th; D-2400 3rd “set pace-stayed on” (adj 153.85, yielding)","Best actual 3000m coastal result; placed last 3; MR117 — but a front-runner"],
-          ["HOLDING THUMBS (4)","60.0","2nd in this race last yr (25.07.05 D-3000); K-2500 wins; D-2400 7th last (adj 154.35, yielding)","Highest MR (119), C Little (marathon man), proven 3000m — but modest last run + top weight"],
-          ["MASTER REDOUTE (3)","60.0","D-2400 4th “stayed on” (adj 153.95, yielding); K-2800 4th “stayed on”","Consistent, 2kg better off w/ Shoot the Rapids; but a chronic placer (5 wins/31)"],
-          ["VIHAAN'S BOMB (13)","52.5","D-2400 WIN last start “moved up, easy” (152.2 off 62.0 → adj 151.25 at 52.5 today)","9.5kg lighter than that win, staying on, Yeni — value flyer. Knock: MR86, class rise, 3000m unproven"]
+          ["AHEAD OF THE FACTS (10)","58.5","D turf 2400 (good)","149.8 (62.0, 2nd “running on”)","149.45 (2400)","drops 3.5kg off that run; “running on” = 3000 step-up +; 3rd this race last yr"],
+          ["SHOOT THE RAPIDS (8)","60.0","D turf 3000","Gold Vase 2nd last yr (beaten 0.40)","n/a clean 3000 time","best actual 3000 result; D-2400 153.5 (56.5, yielding)→153.85"],
+          ["HOLDING THUMBS (4)","60.0","D turf 3000","Gold Vase 2nd 2yr / placings","n/a clean 3000 time","MR119, C Little; D-2400 154.2 (58.5, yielding)→154.35 last, modest"],
+          ["MASTER REDOUTE (3)","60.0","D turf 2400 (yielding)","153.8 (58.5, 4th “stayed on”)","153.95 (2400)","consistent placer; 2kg better off w/ Shoot"],
+          ["VIHAAN'S BOMB (13)","52.5","D turf 2400","152.2 (62.0, won “easy”)","151.25 (2400)","drops 9.5kg off a win → sharpest equiv in field; class/3000 unproven"],
+          ["TITANS OF WAR (2)","54.0","—","n/a (Vaal 2400 fast, 0 coastal)","—","market trap raider"]
         ]},
       {t:'lp', k:"Verdict", h:`genuinely tight at the top, and the tiebreaker is pace. Poets Warrior (Highveld pacesetter, “tired late” on repeat) and front-running Shoot the Rapids both want the lead — a truly-run 3000m is likely, which is gold for the closers who finish over the top. That's exactly <strong>AHEAD OF THE FACTS (10)</strong>: the horse with the “running on” note, best weighted of the front trio, 3rd in this race last year, Fourie up. His profile and the pace shape both point his way, so he's my narrow top.`},
       {t:'p', h:`Then SHOOT THE RAPIDS (8) — the best actual coastal-3000m result in the field (Gold Vase 2nd, 0.40L) and staying on last start; only mild concern is that he sets the pace into a race with another pacemaker. HOLDING THUMBS (4) completes it on class (MR119) and a Gold Vase 2nd, though 60kg and a flat last run keep him third. MASTER REDOUTE (3) and VIHAAN'S BOMB (13) are the each-way plays — and I'd single out Vihaan's Bomb as method-value the 20/1 underrates: a fresh coastal 2400m win, dropping to 52.5, adjusting to ~151.25. His only real questions are class and the extra 600m.`},
@@ -322,16 +329,15 @@ const races = [
       {t:'lp', k:"Surface", h:`the key trial (Devon Air) was D-turf and it's the July card — I'll treat as D-turf, but there's one real poly-dependent bomb below, so worth confirming.`},
       {t:'p', h:`14 fillies, nearly all at 60.0 so weight-adjustment is a non-factor — this is a pure raw-time-plus-form 2yo race. The whole form revolves around the Devon Air Stakes (26.06.06, D-turf 1400m), the fillies' championship trial four weeks out:`},
       {t:'table',
-        head:["Horse","Wt","Coastal 1400m form (raw)","Note"],
-        cls:["c-horse","c-mono","c-note","c-note"],
+        head:["Horse","Wt today","Surface","Best 1400m raw (wt that day)","→ Today-equiv","Note"],
+        cls:["c-horse","c-mono","c-mono","c-fig","c-equiv","c-note"],
         rows:[
-          ["ALICE B TOKLAS (7)","60.0","Devon Air WINNER 86.0 “going away” (beat Royal Tiara 1.80L)","Fastest coastal turf 1400m, proven exact trip, Fourie, C&D winner. Clear top"],
-          ["ROYAL TIARA (3)","60.0","Devon Air 2nd 86.4 “overraced-switch 300”","Beaten only by ABT and didn't settle → room to improve; C Murray"],
-          ["FERRARI FLAIR (4)","60.0","Devon Air 3rd 86.5 “stayed on”","The staying-on note is a genuine 1400m positive; only 2.3L off the win"],
-          ["PALACE OF ARVERNIA (13)","60.0","D-1200 WIN 74.2 “cruised”; S-1200 4th “stayed on”","Progressive (2 runs), coastal winner “on the upgrade” — but 1400m unproven"],
-          ["TOO FAST TO FIESTA (5)","60.0","D-1200 WIN 74.4 “cruised”","Coastal win, Fortune, but no 1400m form"],
-          ["AMC ROY'S FANTASY (8)","60.0","G-poly 1400m WIN 83.2 “going away”","Fastest coastal 1400 raw of anyone — but on poly. Turf form modest"],
-          ["TUDOR ROSE (2)","60.0","1 run: S-1200 maiden win 69.1 “green-got up”","Blinkers on, “could be anything,” Lerena — unknowable on stats"]
+          ["ALICE B TOKLAS (7)","60.0","D turf","86.0 (60.0, won “going away”)","86.00","fastest coastal turf 1400; proven C&D; Fourie"],
+          ["ROYAL TIARA (3)","60.0","D turf","86.4 (60.0, 2nd “overraced”)","86.40","1.80L off ABT but didn't settle → improver"],
+          ["FERRARI FLAIR (4)","60.0","D turf","86.5 (60.0, 3rd “stayed on”)","86.50","genuine 1400 stay-on note; real turf form"],
+          ["PALACE OF ARVERNIA (13)","60.0","D turf 1200","74.2 (60.0, won “cruised”)","74.20 (1200)","on the upgrade but no 1400 line yet"],
+          ["TOO FAST TO FIESTA (5)","60.0","D turf 1200","74.4 (60.0, won “cruised”)","74.40 (1200)","coastal win, no 1400 form"],
+          ["AMC ROY'S FANTASY (8)","60.0","G poly","83.2 (60.0, won “going away”)","83.20","fastest coastal 1400 raw of all — but poly; turf modest"]
         ]},
       {t:'lp', k:"Verdict", h:`<strong>ALICE B TOKLAS (7)</strong> is the clean method top — she won the D-turf championship trial going away, owns the fastest coastal turf 1400m in the field, is proven at the exact distance and course, and has Fourie. ROYAL TIARA (3) is the obvious danger: beaten a length-and-three-quarters by ABT in that same trial but overraced (didn't settle), so there's improvement to come with a cleaner run.`},
       {t:'p', h:`For third I land a shade differently from the handoff. <strong>FERRARI FLAIR (4)</strong> was 3rd in the Devon Air and — critically — “stayed on,” which is the exact distance-fit signal the method rewards for a filly who wants every yard of 1400m; she has real turf 1400m form, unlike the alternatives. PALACE OF ARVERNIA (13) is the lovely “still on the upgrade” progressive type, but she's on trust for the trip (max 1200m), so I have her as the each-way improver rather than a confident third.`},
@@ -351,15 +357,16 @@ const races = [
       {t:'lp', k:"Surface", h:`the colts' trial (Gatecrasher) was D-turf, July card — D-turf most likely, with one poly angle noted below. All runners ~60.0, so again raw-time-and-form, no weight play.`},
       {t:'p', h:`The colts' championship trial is the Gatecrasher Stakes (26.06.06, D-turf 1400m), and separately there's a strong July-Prep 1400m series (E-strip, a Greyville configuration — coastal) that the favourite has been winning.`},
       {t:'table',
-        head:["Horse","Wt","Coastal 1400m form (raw)","Note"],
-        cls:["c-horse","c-mono","c-note","c-note"],
+        head:["Horse","Wt today","Surface","Best 1400m raw (wt that day)","→ Today-equiv","Note"],
+        cls:["c-horse","c-mono","c-mono","c-fig","c-equiv","c-note"],
         rows:[
-          ["VIBE CHECK (1)","60.0","Unbeaten at 1400m: 83.4 & 84.7 (both WON); beat Kazenoyoni & Riff Raff Boy","Only sub-par 1400 clock in the race, winning trajectory, Veale, hat-trick bid. Clear top"],
-          ["KAZENOYONI (10)","60.0","Gatecrasher 2nd 86.5 (D-turf, 0.80L); 2nd to Vibe Check at 1400 (83.8)","Fastest actual D-turf 1400 among the colts; consistent, Fortune"],
-          ["RED SPICE (7)","60.0","K-1200 wins (~71s); 1 troubled D-1200 (3rd, injury)","Fast Cape sprinter, de Melo — but no 1400m form, 1 coastal run, 12-wk break"],
-          ["GREEN ENERGY (8)","60.0","G-poly 1400 WIN 85.3; but Gatecrasher 10th 87.3","Genuine coastal 1400 win — flopped last start though. Erratic"],
-          ["COAST OF THE SUN (17)","60.0","D-turf 1400 WIN 85.8","Real coastal 1400m win at 50/1 — outclassed on time but a place flyer"],
-          ["RIFF RAFF BOY (4)","60.0","E-1400 3rd 84.2 (behind VC); D-1400 win 87.5; Gatecrasher 5th","Proven at trip but consistently behind VC/Kazenoyoni — outclassed"]
+          ["VIBE CHECK (1)","60.0","E/coastal","83.4 (60.0, won)","83.40","only sub-par 1400 clock; also 84.7 won; beat Kazenoyoni & Riff Raff"],
+          ["KAZENOYONI (10)","60.0","D turf","86.5 (60.0, 2nd Gatecrasher)","86.50","fastest actual D-turf 1400 of the colts; also 83.8 behind VC"],
+          ["GREEN ENERGY (8)","60.0","G poly","85.3 (60.0, won)","85.30","real coastal 1400 win — but flopped Gatecrasher (87.3). Erratic"],
+          ["COAST OF THE SUN (17)","60.0","D turf","85.8 (58.5, won)","85.65","real D-turf 1400 win at 50/1; drops 1.5kg → 85.65. Place flyer"],
+          ["RIFF RAFF BOY (4)","60.0","E/coastal","84.2 (60.0, 3rd behind VC)","84.20","proven trip but consistently behind VC/Kazenoyoni"],
+          ["RED SPICE (7)","60.0","K 1200","71.2 (60.0, won)","71.20 (1200)","fast Cape sprint — no 1400 line, 1 Greyville run, 12-wk break"],
+          ["THE CULLINAN (2)","60.0","—","n/a (all-K, 0 Greyville, max 1200)","—","6/1, raider fade"]
         ]},
       {t:'lp', k:"Verdict", h:`<strong>VIBE CHECK (1)</strong> is the standout and the method loves him — he's the only colt unbeaten over 1400m (two wins), owns the only at/under-par coastal 1400 clocks (83.4, 84.7), has already beaten the two main dangers, carries a rising-star trajectory and Veale, and goes for the hat-trick. Textbook top pick.`},
       {t:'p', h:`KAZENOYONI (10) is the solid each-way: 2nd in the genuine D-turf Gatecrasher (the fastest actual D-1400 among these colts) and 2nd to Vibe Check at 1400m — consistent, reliable, Fortune.`},
@@ -377,25 +384,30 @@ const races = [
     pick:{variant:"standout", flag:"Standout", rk:"#2", horse:"Native Ruler", num:"(10)",
       line:"The only runner with a genuine Greyville-2200 time (sub-par), plus a D-2400 win three weeks ago."},
     body:[
-      {t:'p', h:`Twenty declared, 3 (The Ultimate King) and 4 (Star Major) scratched. Standard July pattern is playing out: the ratings/market lean on LEGAL COUNSEL (5, MR128) and a Turffontein battalion (Hazy Dazy, Olivia's Way, Aladdin's Lamp, Choisaanada) whose clocks are altitude-flattered — a big deal at a true 2200m. The method fades the flat-track raiders and rides the KZN-prepped horses with real coastal turf form at the trip.`},
-      {t:'p', h:`The single most important line in the whole card: <strong>NATIVE RULER (10)</strong> is the only runner with a genuine Greyville 2200m time — he ran in last year's July (135:0), and weight-adjusted to today that's 135.45, under par 137:6 — plus he won the D-2400 three weeks ago, “cruised in,” beating Imilenzeyokududuma. Proven trip, fastest real 2200m clock, fresh, KZN. That's the profile the system is built to find.`},
+      {t:'p', h:`Over 2200m a raw-time ranking is a blunter instrument than in a sprint — pace, tactics and going swamp small time gaps — so for the July the <strong>collateral head-to-heads lead and the clock drops to support</strong>. Only one horse owns a genuine D-2200 clock (Native Ruler, last year's July); everyone else's best time is at an adjacent trip, so the raw-time column is labelled by distance and treated as corroboration, not ranking.`},
       {t:'table',
-        head:["Horse","Wt","Coastal (D-turf) form at/near trip","Note"],
-        cls:["c-horse","c-mono","c-note","c-note"],
+        head:["Horse","Wt today","Surface","Best relevant raw (wt that day)","→ Today-equiv","Note"],
+        cls:["c-horse","c-mono","c-mono","c-fig","c-equiv","c-note"],
         rows:[
-          ["NATIVE RULER (10)","58.5","D-2200 135:0 (adj 135.45, sub-par); D-2400 win 3wks ago","Only genuine 2200m time in field; proven 2400m; MR121, Snaith/de Melo"],
-          ["WISH LIST (7)","54.5","D-2000 WIN, “ran on/got up late”","Unbeaten at Greyville, ideal step-up signal, light, Snaith, MR 90s→117"],
-          ["ISIVIVANE (1)","52.0","D-1900 WIN “fought hard”","MR rocketing 95→108, feather 52kg; only proven to 1950m (300m step)"],
-          ["REGULATION (2)","52.0","D-1900 2nd to Isivivane (wide, beaten 0.60)","Staying rallies, 52kg, Cape 1800 wins, top intl jockey"],
-          ["NOTE TO SELF (11)","55.0","D-2000 122.3 adj — fastest of the 2000m group","Same-day clock beat Wish List/Minogue by ~3s; well-in, K-2000 win"],
-          ["MINOGUE (16)","56.0","D-2000 2nd, beaten 0.05 to Wish List (adj 125.2)","Wish List's shadow, drops 4kg, 9 C&D, mare stays"],
-          ["CURIOUS GIRL (20)","52.0","D-2400 2nd (beaten 0.25) + D-2400 3rd","Proven coastal stayer dropping to 2200m, 52kg, MR80→100 improver"]
+          ["NATIVE RULER (10)","58.5","D turf 2200","135.0 (54.0, July 6th)","135.45 (only true 2200)","+4.5kg vs that day and still sub-par; won D-2400 3wks ago “cruised” beating Imi"],
+          ["WISH LIST (7)","54.5","D turf 2000","125.6 (57.5, won “got up late”)","125.30 (2000)","unbeaten at Greyville; drops 3kg off a win; step-up signal"],
+          ["NOTE TO SELF (11)","55.0","D turf 2000","122.8 (60.0, 3rd)","122.30 (2000)","fastest of the 2000m group; drops 5kg → sharpest equiv"],
+          ["CURIOUS GIRL (20)","52.0","D turf 2400","152.8 (58.0, 2nd, beaten 0.25)","152.20 (2400)","proven coastal stayer dropping to 2200; 52kg; MR80→100"],
+          ["ISIVIVANE (1)","52.0","D turf 1900","119.3 (56.0, won “fought”)","119.00 (1900)","feather 52kg; MR rocketing; only proven to 1950 (300m step)"],
+          ["REGULATION (2)","52.0","D turf 1900","119.1 (54.0, 2nd to Isiv)","119.30 (1900)","52kg, top intl jockey, staying rallies"],
+          ["MINOGUE (16)","56.0","D turf 2000","125.6 (60.0, 2nd, beaten 0.05)","125.20 (2000)","Wish List's shadow; drops 4kg"],
+          ["LEGAL COUNSEL (5)","62.0","D turf 1600","97.1 (60.0, Gr1 2nd 0.05)","97.30 (1600)","MR128 but best trip 600m short + 62kg top weight"]
         ]},
-      {t:'lp', k:"A raw-time wrinkle to be honest about", h:`on 26.05.30 there were two D-2000 races on the same day/track — so they are comparable. The DlyNw race (Note To Self 122.3 adj, Viva's Liberte 122.3 adj) was run ~3s faster than the Wlvng race that Wish List/Minogue contested (125.2–125.3 adj). Strict raw-time says Note To Self and Viva's Liberte out-clocked Wish List. The counter is that Wish List won her heat, “got up late,” and beat Note To Self and Viva's Liberte in the K-2000 Derby collateral — and the Wlvng race looks tactically slow (“pace-drop rein 100m”). Net: I still rate Wish List on the win + step-up signal, but Note To Self (11) is a strong well-in each-way on the faster clock, and Viva's Liberte (9) a live outsider on time + a 7kg weight drop.`},
-      {t:'vp', k:"Verdict", h:`NATIVE RULER (10) → WISH LIST (7) → ISIVIVANE (1), with REGULATION (2), NOTE TO SELF (11) and MINOGUE (16) each-way, and CURIOUS GIRL (20) the light-weight value/place flyer (genuine D-2400 form, 52kg, stamina in hand at 2200m). MOCHA BLEND (13) the “dark horse” saver — her Gr1 Summer Cup was Highveld (discount) but she backs it with real D-2000 form and is crying out for further.`},
-      {t:'lp', k:"Against the market", h:`LEGAL COUNSEL (5) — MR128 and a super D-1600 Gr1 second (beaten 0.05), but 2200m is 600m beyond his best trip and he shoulders 62.0kg top weight; the class is real, the trip and weight are the method's exit. KING PELLES (17) — proven D-stayer (D-3200 Gold Cup win, “no stamina doubts”), but no sharp middle-distance coastal time and 59kg; each-way only if the pace is strong.`},
-      {t:'fades', h:`Highveld raiders, altitude clocks, no coastal form: HAZY DAZY (6) — all-Highveld, her only coastal try was a D-2000 8th beaten 11.4L, MR117 irrelevant here. OLIVIA'S WAY (15) — 100% Turffontein, perennial placer, last win 62 wks ago. ALADDIN'S LAMP (18) — genuine stayer but 100% Highveld, altitude marathon times don't transfer. CHOISAANADA (19) — 100% Highveld + 10-wk break.`},
-      {t:'lp', k:"Pace / shape", h:`with Isivivane handy, Viva's Liberte and Legal Counsel wanting to be forward, a truly-run 2200m is likely — which is gold for the closers/stayers (Native Ruler, Wish List, Curious Girl “kept finding,” Mocha Blend).`}
+      {t:'lp', k:"Read on the clock", h:`the only same-distance-rankable line is <strong>Native Ruler's 135.45</strong>, and the striking thing the raw-vs-equiv column exposes is that he ran 135.0 carrying just 54.0 last year — put today's 58.5 on him and he's still under par 137:6. Nobody else has a 2200 clock to rank against it; the rest are 1900–2000m figures that tell you about ability and weight-value, but not the trip.`},
+      {t:'ul', k:"The collateral — leading", intro:`The web of head-to-heads in this field is dense, and it points hard at the top:`, items:[
+        `<strong>Native Ruler beat everyone that matters, recently, at the trip-plus.</strong> In the Winter Stayers (26.06.13, D-2400) he won, with Shoot the Rapids 3rd, Master Redoute 4th, Holding Thumbs 5th, Son of Raj well back — and crucially he beat Imilenzeyokududuma (2nd) and Tenpenny. A genuine coastal 2400 win over horses contesting the Gold Vase. He also beat Isivivane at Gry19 (26.05.09) and finished ahead of Regulation there.`,
+        `<strong>Wish List's collateral is all wins or narrow losses at Greyville,</strong> and she holds Note To Self and Viva's Liberte on the K-2000 Derby line (she won it, they were 2nd/3rd) — the counter to Note To Self out-clocking her on the day. So the collateral says Wish List ≥ Note To Self despite the raw time saying the reverse — exactly the case where, over a staying trip, I trust the h2h over the clock.`,
+        `<strong>Curious Girl's collateral is quietly strong for a 52kg pot-hunter:</strong> 2nd (beaten 0.25) and 3rd in D-2400s, never far away carrying weight she doesn't carry today. Dropping to 2200 off proven 2400 form at 52kg is the classic well-in stayer.`,
+        `<strong>Legal Counsel's collateral is a warning, not a boost:</strong> his MR128 is built on 1600m Gr1 form; every time he's stepped toward this trip the h2h thins out, and here he adds 62.0kg top weight. The collateral doesn't show him beating genuine 2200m stayers.`
+      ]},
+      {t:'vp', k:"Verdict", h:`the collateral and the one real 2200 clock agree, which is why this is the day's marquee method play. <strong>NATIVE RULER (10)</strong> — beat the Gold Vase brigade and Imi over 2400m three weeks ago, owns the only sub-par Greyville 2200 time even with more weight, fresh, Snaith/de Melo. <strong>WISH LIST (7)</strong> second on her unbeaten-at-Greyville record and the collateral edge over Note To Self/Minogue (I trust that h2h over her slower raw heat). <strong>ISIVIVANE (1)</strong> third on trajectory + feather 52kg, though the 300m step-up and lack of a 2200 line keep her behind the two proven horses. So: NATIVE RULER (10) → WISH LIST (7) → ISIVIVANE (1), with REGULATION (2), NOTE TO SELF (11) and MINOGUE (16) each-way, and CURIOUS GIRL (20) the 52kg proven-stayer value flyer (her D-2400 collateral is better than 80/1 implies). MOCHA BLEND (13) the dark-horse saver — but her best form is Highveld, a collateral-light discount.`},
+      {t:'fades', h:`raider/altitude, collateral doesn't support at a true coastal 2200: LEGAL COUNSEL (5) — 1600m collateral + 62kg. HAZY DAZY (6), OLIVIA'S WAY (15), ALADDIN'S LAMP (18), CHOISAANADA (19) — Highveld-dominated form; where they do appear in coastal collateral (Olivia's Way in the Winter Stayers/Chmch lines) they finish behind the KZN horses, not ahead.`},
+      {t:'lp', k:"Pace / shape", h:`with Isivivane, Viva's Liberte and Legal Counsel all wanting to be forward, a truly-run 2200 is likely — which favours the collateral-proven closers (Native Ruler, Wish List, Curious Girl) over the flat-track speed horses. Clock says Native Ruler; collateral says Native Ruler; pace says Native Ruler. That's about as aligned as the method gets.`}
     ]
   },
 
@@ -563,6 +575,7 @@ function renderBody(blocks){
     if(b.t==='p') return `<p class="bp">${b.h}</p>`;
     if(b.t==='lp') return `<div class="note"><span class="k">${b.k}</span><p class="v">${b.h}</p></div>`;
     if(b.t==='vp') return `<div class="note verdict"><span class="k">${b.k}</span><p class="v">${b.h}</p></div>`;
+    if(b.t==='ul') return `<div class="note"><span class="k">${b.k}</span>${b.intro?`<p class="v" style="margin-bottom:6px">${b.intro}</p>`:''}<ul class="nlist">${b.items.map(i=>`<li>${i}</li>`).join('')}</ul></div>`;
     if(b.t==='fades') return `<div class="fades"><span class="k">Fades</span><p class="v">${b.h}</p></div>`;
     if(b.t==='aside') return `<div class="aside"><span class="k">vs the handoff</span><p class="v">${b.h}</p></div>`;
     if(b.t==='table'){
@@ -620,7 +633,6 @@ function select(key){
   panel.classList.remove('panel');void panel.offsetWidth;panel.classList.add('panel');
   if(key==='best'){panel.innerHTML=renderBest();}
   else{panel.innerHTML=renderRace(races.find(r=>r.no===Number(key)));}
-  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
 select('best');
